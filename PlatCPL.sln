@@ -1,7 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-# SharpDevelop 3.1.0.4545
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+# SharpDevelop 4.0.0.7070
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatCPL", "PlatCPL\PlatCPL.csproj", "{E1F34ABE-F1E2-44B2-98C0-70C21D9D7309}"
 EndProject
 Global
