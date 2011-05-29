@@ -17,24 +17,39 @@ namespace PlatCPL
 		//Class based on Chilkat XML class: http://www.chilkatsoft.com/
 		public string Tag;
 		public string Content;
-		public XML3[] children;
-		public XML3[] attributes;
+		public System.Collections.Generic.List<XML3> children;
+		public System.Collections.Generic.List<XML3> attributes;
+		//public XML3[] children;
+		//public XML3[] attributes;
 		public XML3 parent = null;
 		
 		public XML3()
 		{
 			Tag = "";
 			Content = "";
-			children = new XML3[0];
-			attributes = new XML3[0];
+			children = new System.Collections.Generic.List<XML3>();
+			attributes = new System.Collections.Generic.List<XML3>();
+			//children = new XML3[0];
+			//attributes = new XML3[0];
 		}
 		public XML3(string name, string content)
 		{
 			Tag = name;
 			if(content!=null)Content = content;
 			else Content = "";
-			children = new XML3[0];
-			attributes = new XML3[0];
+			children = new System.Collections.Generic.List<XML3>();
+			attributes = new System.Collections.Generic.List<XML3>();
+			//children = new XML3[0];
+			//attributes = new XML3[0];
+		}
+		public XML3(string name)
+		{
+			Tag = name;
+			Content = "";
+			children = new System.Collections.Generic.List<XML3>();
+			attributes = new System.Collections.Generic.List<XML3>();
+			//children = new XML3[0];
+			//attributes = new XML3[0];
 		}
 
 		#region XML3 file I/O
@@ -42,8 +57,10 @@ namespace PlatCPL
 		{
 			Tag = "";
 			Content = "";
-			children = new XML3[0];
-			attributes = new XML3[0];
+			children = new System.Collections.Generic.List<XML3>();
+			attributes = new System.Collections.Generic.List<XML3>();
+			//children = new XML3[0];
+			//attributes = new XML3[0];
 			System.IO.StreamReader fileStream = null;
 			try
 			{
@@ -886,7 +903,7 @@ namespace PlatCPL
 					System.Diagnostics.Trace.WriteLine(e.Message);
 				}
 			}
-			if(children.Length>0)
+			if(children.Count>0)
 			{
 				foreach(XML3 crianca in children) crianca.saveElement(file);
 			}
@@ -895,8 +912,8 @@ namespace PlatCPL
 		}
 		#endregion
 		
-		public int NumChildren{ get{ return children.Length; } }
-		public int NumAttributes{ get{ return attributes.Length; } }
+		public int NumChildren{ get{ return children.Count; } }
+		public int NumAttributes{ get{ return attributes.Count; } }
 		
 		#region XML3 contents modification
 		public bool HasChildWithTag(string name)
@@ -924,7 +941,7 @@ namespace PlatCPL
 		}
 		public XML3 GetChild(int index)
 		{
-			if(index>=0&&index<children.Length)return children[index];
+			if(index>=0&&index<children.Count)return children[index];
 			return null;
 		}
 		public XML3 GetChildWithTag(string name)
@@ -940,18 +957,27 @@ namespace PlatCPL
 		}
 		public void RemoveChild(int index)
 		{
-			int j=index;
-			for(int i=index+1;i<children.Length;i++)
+			children.RemoveAt(index);
+			/*int j=index;
+			for( int i=index+1; i<children.Count; i++)
 			{
 				children[j++]=children[i];
 			}
-			if(j==children.Length-1)System.Array.Resize<XML3>(ref children,j);
+			if(j==children.Length-1)System.Array.Resize<XML3>(ref children,j);*/
 		}
-		public void RemoveChild(string name)
+		public bool RemoveChild(string name)
 		{
-			int j=0;
+			for( int i=0; i<children.Count; i++)
+			{
+				if(children[i].Tag == name)
+				{
+					return children.Remove(children[i]);
+				}
+			}
+			return false;
+			/*int j=0;
 			int i=0;
-			for(;i<children.Length;i++)
+			for( ; i<children.Length; i++)
 			{
 				if(i==j)
 				{
@@ -959,11 +985,19 @@ namespace PlatCPL
 				}
 				else children[j++]=children[i];
 			}
-			if(j==children.Length-1)System.Array.Resize<XML3>(ref children,j);
+			if(j==children.Length-1)System.Array.Resize<XML3>(ref children,j);*/
 		}
-		public void RemoveAttribute(string name)
+		public bool RemoveAttribute(string name)
 		{
-			int j=0;
+			for( int i=0; i<attributes.Count; i++)
+			{
+				if(attributes[i].Tag == name)
+				{
+					return attributes.Remove(attributes[i]);
+				}
+			}
+			return false;
+			/*int j=0;
 			int i=0;
 			for(;i<attributes.Length;i++)
 			{
@@ -973,7 +1007,7 @@ namespace PlatCPL
 				}
 				else attributes[j++]=attributes[i];
 			}
-			if(j==attributes.Length-1)System.Array.Resize<XML3>(ref attributes,j);
+			if(j==attributes.Length-1)System.Array.Resize<XML3>(ref attributes,j);*/
 		}
 		public void UpdateChildContent(string name, string content)
 		{
@@ -1026,38 +1060,48 @@ namespace PlatCPL
 		}
 		public string GetAttributeName(int index)
 		{
-			if(index>0&&index<attributes.Length)return attributes[index].Tag;
+			if( index>0 && index<attributes.Count )return attributes[index].Tag;
 			return null;
 		}
 		public string GetAttributeValue(int index)
 		{
-			if(index>0&&index<attributes.Length)return attributes[index].Content;
+			if( index>0 && index<attributes.Count )return attributes[index].Content;
 			return null;
 		}
 		public XML3 NewChild(string name, string content)
 		{
-			System.Array.Resize<XML3>(ref children, children.Length+1);
-			children[children.Length-1] = new XML3(/*comm,*/ name, content);
+			XML3 newChild = new XML3(name, content);
+			newChild.parent = this;
+			children.Add(newChild);
+			return newChild;
+			/*System.Array.Resize<XML3>(ref children, children.Length+1);
+			children[children.Length-1] = new XML3(name, content);
 			children[children.Length-1].parent = this;
-			return children[children.Length-1];
+			return children[children.Length-1];*/
 		}
 		public bool NewChild(XML3 child)
 		{
 			if(child==null)return false;
-			System.Array.Resize<XML3>(ref children, children.Length+1);
+			child.parent = this;
+			children.Add(child);
+			/*System.Array.Resize<XML3>(ref children, children.Length+1);
 			children[children.Length-1] = child;
-			children[children.Length-1].parent = this;
+			children[children.Length-1].parent = this;*/
 			return true;
 		}
 		public void NewChildInt2(string name, int content)
 		{
 			NewChild(name, content.ToString());
 		}
-		public void AddAttribute(string attribute, string attValue)
+		public bool AddAttribute(string attribute, string attValue)
 		{
-			System.Array.Resize<XML3>(ref attributes, attributes.Length+1);
-			attributes[attributes.Length-1] = new XML3(/*comm,*/ attribute, attValue);
-			attributes[attributes.Length-1].parent = this;
+			XML3 newAttribute = new XML3(attribute, attValue);
+			newAttribute.parent = this;
+			attributes.Add(newAttribute);
+			return true;
+			/*System.Array.Resize<XML3>(ref attributes, attributes.Length+1);
+			attributes[attributes.Length-1] = new XML3(attribute, attValue);
+			attributes[attributes.Length-1].parent = this;*/
 		}
 		public void AddAttributeInt(string attribute, int attValue)
 		{
