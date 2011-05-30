@@ -62,7 +62,7 @@ namespace PlatCPL
 			this.tabPage1.Name = "tabPage1";
 			this.tabPage1.Size = new System.Drawing.Size(428, 359);
 			this.tabPage1.TabIndex = 0;
-			this.tabPage1.Text = "PlatCPL";
+			this.tabPage1.Text = "PlatCPLv4";
 			this.tabPage1.UseVisualStyleBackColor = true;
 			// 
 			// comboBox1

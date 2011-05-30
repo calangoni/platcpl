@@ -11,10 +11,14 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <TargetFrameworkProfile />
     <SourceAnalysisOverrideSettingsFile>C:\Users\Langoni\AppData\Roaming\ICSharpCode/SharpDevelop3.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <OutputPath>bin\Debug\</OutputPath>
-    <DebugSymbols>True</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
     <DebugType>Full</DebugType>
     <Optimize>False</Optimize>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
@@ -27,6 +31,13 @@
     <Optimize>True</Optimize>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
     <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <BaseAddress>4194304</BaseAddress>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <FileAlignment>4096</FileAlignment>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
   <ItemGroup>
@@ -44,46 +55,70 @@
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="zlib.net">
+      <HintPath>ThirdParty\zlib.net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\PhoneContacts.cs" />
-    <Compile Include="Interfaces\PhoneBook.cs" />
-    <Compile Include="Interfaces\PhoneBook.Designer.cs">
-      <DependentUpon>PhoneBook.cs</DependentUpon>
-    </Compile>
     <Compile Include="Classes\PlatCPL_Data.cs" />
+    <Compile Include="Interfaces\MatlabFilesAnalyzer.cs" />
+    <Compile Include="Interfaces\MatlabFilesAnalyzer.Designer.cs">
+      <DependentUpon>MatlabFilesAnalyzer.cs</DependentUpon>
+    </Compile>
     <Compile Include="PlatCPL\PlatCPLv4Core.cs" />
     <Compile Include="PlatCPL\Constants.cs" />
     <Compile Include="PlatCPL\PcAppHandler.cs" />
-    <Compile Include="PlatCPL\MainForm.cs" />
-    <Compile Include="PlatCPL\MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="PlatCPL\I_PlatCPLv4.cs" />
     <Compile Include="PlatCPL\I_PlatCPLv4.Designer.cs">
       <DependentUpon>I_PlatCPLv4.cs</DependentUpon>
     </Compile>
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ThirdParty\HardwareHelperLib.cs" />
-    <Compile Include="ThirdParty\ThirdParty.cs" />
-    <EmbeddedResource Include="Interfaces\PhoneBook.resx">
-      <DependentUpon>PhoneBook.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PlatCPL\MainForm.resx">
+    <Compile Include="Properties\MainForm.cs" />
+    <Compile Include="Properties\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PlatCPL\PlatCPLv4.resx">
-      <DependentUpon>I_PlatCPLv4.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
+    </Compile>
+    <Compile Include="Properties\Program.cs" />
+    <Compile Include="ThirdParty\HardwareHelperLib.cs" />
+    <Compile Include="ThirdParty\matlab\common\ByteBuffer.cs" />
+    <Compile Include="ThirdParty\matlab\common\MatDataTypes.cs" />
+    <Compile Include="ThirdParty\matlab\io\MatFileFilter.cs" />
+    <Compile Include="ThirdParty\matlab\io\MatFileHeader.cs" />
+    <Compile Include="ThirdParty\matlab\io\MatFileInputStream.cs" />
+    <Compile Include="ThirdParty\matlab\io\MatFileReader.cs" />
+    <Compile Include="ThirdParty\matlab\io\MatFileWriter.cs" />
+    <Compile Include="ThirdParty\matlab\io\MatlabIOException.cs" />
+    <Compile Include="ThirdParty\matlab\io\MatTag.cs" />
+    <Compile Include="ThirdParty\matlab\types\ByteStorageSupport.cs" />
+    <Compile Include="ThirdParty\matlab\types\GenericArrayCreator.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLArray.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLCell.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLChar.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLDouble.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLEmptyArray.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLInt16.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLInt32.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLInt64.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLInt8.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLNumericArray.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLSingle.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLSparse.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLStructure.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLUInt16.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLUInt32.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLUInt64.cs" />
+    <Compile Include="ThirdParty\matlab\types\MLUint8.cs" />
+    <Compile Include="ThirdParty\ThirdParty.cs" />
+    <None Include="Properties\app.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes" />
     <Folder Include="Interfaces" />
     <Folder Include="ThirdParty" />
     <Folder Include="PlatCPL" />
+    <Folder Include="ThirdParty\matlab" />
+    <Folder Include="ThirdParty\matlab\common" />
+    <Folder Include="ThirdParty\matlab\io" />
+    <Folder Include="ThirdParty\matlab\types" />
   </ItemGroup>
 </Project>

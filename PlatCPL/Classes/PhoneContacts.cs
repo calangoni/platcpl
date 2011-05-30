@@ -19,13 +19,15 @@ namespace PlatCPL.Classes
 		public string category;
 		public System.Collections.Generic.List<ContactNumberInfo> numbers;
 		public XML3 otherFields;
+		private PlatCPL.PcAppHandler comm;
 		
-		public PhoneContact(string contactName)
+		public PhoneContact(string contactName, PlatCPL.PcAppHandler parentComm)
 		{
+			comm = parentComm;
 			name = contactName;
 			category = "";
 			numbers = new System.Collections.Generic.List<ContactNumberInfo>();
-			otherFields = new XML3(C.PB.OtherFields, "");
+			otherFields = new XML3(C.PB.OtherFields, "", comm);
 		}
 		
 		public bool addNumber(string number)

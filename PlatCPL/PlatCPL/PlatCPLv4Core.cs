@@ -26,6 +26,7 @@ namespace PlatCPL
 		public string programUserFolder;
 		public string tempFolder;
 		public string xmlDatabaseFile;
+		public PcAppHandler comm;
 		
 		public PlatCPLv4()
 		{
@@ -34,15 +35,17 @@ namespace PlatCPL
 			fileOpenDialog = new System.Windows.Forms.OpenFileDialog();
 			fileSaveDialog = new System.Windows.Forms.SaveFileDialog();
 			folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+			comm = new PcAppHandler();
+			comm.commParent = new InterCommunication(this, -100, this.GetType().Name);
 			//Define default folders and files
 			findSystemFilesAndFolders();
 			//Prepare log screen
 			log = new LogManager();
 			//Prepare platform database
-			database = new PlatCPLDatabaseManager(xmlDatabaseFile);
+			database = new PlatCPLDatabaseManager(xmlDatabaseFile, comm);
 			//Find all applications
 			apps = PlatCPL.ThirdParty.GetAllClasses(C.S.InterfacesNamespace);
-			foreach(string interfaceClass in apps) log.showMessage(E.MsgType.Info, "App: "+interfaceClass);
+			//foreach(string interfaceClass in apps) comm.infoMsg("App: "+interfaceClass);
 		}
 		
 		public PcAppHandler getApplicationInstance(string appName)
@@ -126,31 +129,41 @@ namespace PlatCPL
 	{
 		private string XMLfileName;
 		private XML3 XMLdatabase;
+		private PlatCPL.PcAppHandler comm;
 
-		public PlatCPLDatabaseManager(string XMLfilePath)
+		public PlatCPLDatabaseManager(string XMLfilePath, PcAppHandler parentComm)
 		{
+			comm = parentComm;
 			XMLfileName = "";
-			XMLdatabase = new XML3(C.S.Database4Name);
+			XMLdatabase = new XML3(C.S.Database4Name, comm);
 			if( XMLfilePath!=null && XMLfilePath.Length>0 )
 			{
 				try
 				{
 					System.IO.FileInfo dbFileInfo = new System.IO.FileInfo(XMLfilePath);
-					if(dbFileInfo.Exists)XMLdatabase.LoadXmlFile(dbFileInfo.FullName);
-					if( XMLdatabase.Tag==C.S.Database4Name && XMLdatabase.Content=="" )
+					if(dbFileInfo.Exists)
 					{
-						XMLfileName = XMLfilePath;
+						XMLdatabase.LoadXmlFile(dbFileInfo.FullName);
+						if( XMLdatabase.Tag==C.S.Database4Name && XMLdatabase.Content=="" )
+						{
+							XMLfileName = XMLfilePath;
+						}
+						else
+						{
+							XMLfileName = "";
+							XMLdatabase = new XML3(C.S.Database4Name, comm);
+						}
 					}
 					else
 					{
-						XMLfileName = "";
-						XMLdatabase = new XML3(C.S.Database4Name);
+						XMLfileName = XMLfilePath;
 					}
 				}
-				catch(Exception)
+				catch(Exception exc)
 				{
 					XMLfileName = "";
-					XMLdatabase = new XML3(C.S.Database4Name);
+					XMLdatabase = new XML3(C.S.Database4Name, comm);
+					comm.errorMsg("Error trying to load: "+XMLfilePath+"\n"+exc.Message);
 				}
 			}
 		}
@@ -230,7 +243,7 @@ namespace PlatCPL
 			platform.fileOpenDialog.Filter = filter;
 			platform.fileOpenDialog.Title = title;
 			platform.fileOpenDialog.InitialDirectory = "";
-			if(defaultFolderId==null || defaultFolderId.Length>0)defaultFolderId = C.S.DefaultFolderTag;
+			if(defaultFolderId==null || defaultFolderId.Length==0)defaultFolderId = C.S.DefaultFolderTag;
 			string defaultFolder = platform.database.loadString(new string[] { C.S.Database4Name, appIdent, C.S.DefaultFoldersTag, defaultFolderId });
 			if(defaultFolder!=null) platform.fileOpenDialog.InitialDirectory = defaultFolder;
 			if(platform.fileOpenDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -244,7 +257,7 @@ namespace PlatCPL
 		}
 		public string selectFolder(string defaultFolderId, string forcedInitialFolder, string title)
 		{
-			if(defaultFolderId==null || defaultFolderId.Length>0)defaultFolderId = C.S.DefaultFolderTag;
+			if(defaultFolderId==null || defaultFolderId.Length==0)defaultFolderId = C.S.DefaultFolderTag;
 			if(forcedInitialFolder!=null && forcedInitialFolder.Length>0) platform.folderBrowserDialog.SelectedPath = forcedInitialFolder;
 			else
 			{
@@ -271,7 +284,7 @@ namespace PlatCPL
 			platform.fileSaveDialog.InitialDirectory = "";
 			platform.fileSaveDialog.FileName = "";
 			platform.fileSaveDialog.Filter = filter;
-			if(defaultFolderId==null || defaultFolderId.Length>0)defaultFolderId = C.S.DefaultFolderTag;
+			if(defaultFolderId==null || defaultFolderId.Length==0)defaultFolderId = C.S.DefaultFolderTag;
 			string defaultFolder = platform.database.loadString(new string[] { C.S.Database4Name, appIdent, C.S.DefaultFoldersTag, defaultFolderId });
 			if(defaultFolder!=null) platform.fileSaveDialog.InitialDirectory = defaultFolder;
 			if(platform.fileSaveDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
