@@ -1,8 +1,8 @@
 ﻿/*
  * Criado por SharpDevelop.
  * Usuário: Langoni
- * Data: 26/12/2010
- * Hora: 15:21
+ * Data: 30/05/2011
+ * Hora: 17:43
  * 
  * Para alterar este modelo use Ferramentas | Opções | Codificação | Editar Cabeçalhos Padrão.
  */
@@ -36,16 +36,12 @@ namespace PlatCPL
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.SuspendLayout();
 			// 
 			// MainForm
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(273, 256);
-			this.Name = "MainForm";
 			this.Text = "PlatCPL";
-			this.ResumeLayout(false);
+			this.Name = "MainForm";
 		}
 	}
 }

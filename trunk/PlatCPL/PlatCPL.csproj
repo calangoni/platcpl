@@ -1,23 +1,29 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{E1F34ABE-F1E2-44B2-98C0-70C21D9D7309}</ProjectGuid>
+    <ProjectGuid>{7559BD56-DCCE-470E-8458-8A3B8FFFCDCC}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <OutputType>WinExe</OutputType>
     <RootNamespace>PlatCPL</RootNamespace>
     <AssemblyName>PlatCPL</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <TargetFrameworkProfile />
     <SourceAnalysisOverrideSettingsFile>C:\Users\Langoni\AppData\Roaming\ICSharpCode/SharpDevelop3.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <NoStdLib>False</NoStdLib>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <BaseIntermediateOutputPath>Properties\obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <BaseAddress>4194304</BaseAddress>
+    <FileAlignment>4096</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>Properties\bin\Debug\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>Full</DebugType>
     <Optimize>False</Optimize>
@@ -25,19 +31,12 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <OutputPath>bin\Release\</OutputPath>
-    <DebugSymbols>False</DebugSymbols>
+    <OutputPath>Properties\bin\Release\</OutputPath>
+    <DebugSymbols>false</DebugSymbols>
     <DebugType>None</DebugType>
     <Optimize>True</Optimize>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
     <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
-    <RegisterForComInterop>False</RegisterForComInterop>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <BaseAddress>4194304</BaseAddress>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <FileAlignment>4096</FileAlignment>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
   <ItemGroup>
@@ -60,20 +59,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\MatlabFilesAnalyzer.cs" />
+    <Compile Include="Interfaces\MatlabFilesAnalyzer.Designer.cs" />
+    <Compile Include="Interfaces\PhoneBook.cs" />
+    <Compile Include="Interfaces\PhoneBook.Designer.cs" />
+    <Compile Include="PlatCPL\Constants.cs" />
+    <Compile Include="PlatCPL\I_PlatCPLv4.cs" />
+    <Compile Include="PlatCPL\I_PlatCPLv4.Designer.cs" />
+    <Compile Include="PlatCPL\PcAppHandler.cs" />
+    <Compile Include="PlatCPL\PlatCPLv4Core.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Classes\PhoneContacts.cs" />
     <Compile Include="Classes\PlatCPL_Data.cs" />
-    <Compile Include="Interfaces\MatlabFilesAnalyzer.cs" />
-    <Compile Include="Interfaces\MatlabFilesAnalyzer.Designer.cs">
-      <DependentUpon>MatlabFilesAnalyzer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="PlatCPL\PlatCPLv4Core.cs" />
-    <Compile Include="PlatCPL\Constants.cs" />
-    <Compile Include="PlatCPL\PcAppHandler.cs" />
-    <Compile Include="PlatCPL\I_PlatCPLv4.cs" />
-    <Compile Include="PlatCPL\I_PlatCPLv4.Designer.cs">
-      <DependentUpon>I_PlatCPLv4.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\MainForm.cs" />
     <Compile Include="Properties\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -109,13 +106,13 @@
     <Compile Include="ThirdParty\matlab\types\MLUInt64.cs" />
     <Compile Include="ThirdParty\matlab\types\MLUint8.cs" />
     <Compile Include="ThirdParty\ThirdParty.cs" />
-    <None Include="Properties\app.config" />
+    <None Include="ThirdParty\zlib.net.dll" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes" />
     <Folder Include="Interfaces" />
-    <Folder Include="ThirdParty" />
     <Folder Include="PlatCPL" />
+    <Folder Include="ThirdParty" />
     <Folder Include="ThirdParty\matlab" />
     <Folder Include="ThirdParty\matlab\common" />
     <Folder Include="ThirdParty\matlab\io" />
