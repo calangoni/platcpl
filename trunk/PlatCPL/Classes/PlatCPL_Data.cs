@@ -22,9 +22,11 @@ namespace PlatCPL
 		//public XML3[] children;
 		//public XML3[] attributes;
 		public XML3 parent = null;
+		private PlatCPL.PcAppHandler comm;
 		
-		public XML3()
+		public XML3(PlatCPL.PcAppHandler parentComm)
 		{
+			comm = parentComm;
 			Tag = "";
 			Content = "";
 			children = new System.Collections.Generic.List<XML3>();
@@ -32,8 +34,9 @@ namespace PlatCPL
 			//children = new XML3[0];
 			//attributes = new XML3[0];
 		}
-		public XML3(string name, string content)
+		public XML3(string name, string content, PlatCPL.PcAppHandler parentComm)
 		{
+			comm = parentComm;
 			Tag = name;
 			if(content!=null)Content = content;
 			else Content = "";
@@ -42,8 +45,9 @@ namespace PlatCPL
 			//children = new XML3[0];
 			//attributes = new XML3[0];
 		}
-		public XML3(string name)
+		public XML3(string name, PlatCPL.PcAppHandler parentComm)
 		{
+			comm = parentComm;
 			Tag = name;
 			Content = "";
 			children = new System.Collections.Generic.List<XML3>();
@@ -68,19 +72,19 @@ namespace PlatCPL
 			}
 			catch(System.Exception exc)
 			{
-				System.Diagnostics.Trace.WriteLine(exc.Message);
+				comm.errorMsg(exc.Message);
 				fileStream = null;
 				return false;
 			}
 			if(fileStream != null)
 			{
-				State_XMLfile state = new State_XMLfile();
+				State_XMLfile state = new State_XMLfile(comm);
 				char[] buffer = new char[4000]; // page = 4096 bytes
 				int bytesRead = fileStream.ReadBlock(buffer, 0, buffer.Length);
 				bool resultOK = false;
 				while(bytesRead > 0)
 				{
-					//for(int i=0; i<bytesRead; i++) System.Diagnostics.Trace.WriteLine(" - "+(i+1)+") '"+(buffer[i])+"' ["+((int)buffer[i])+"]");
+					//for(int i=0; i<bytesRead; i++) comm.infoMsg(" - "+(i+1)+") '"+(buffer[i])+"' ["+((int)buffer[i])+"]");
 					resultOK = readXMLstream(buffer, bytesRead, state);
 					if(resultOK)
 						bytesRead = fileStream.ReadBlock(buffer, 0, buffer.Length);
@@ -90,12 +94,11 @@ namespace PlatCPL
 				fileStream.Close();
 				if(resultOK)
 				{
-					System.Diagnostics.Trace.WriteLine("XML OK!!");
 					return true;
 				}
 				else
 				{
-					System.Diagnostics.Trace.WriteLine("ERROR[64]: there was a problem reading the XML file");
+					comm.errorMsg("ERROR[64]: there was a problem reading the XML file");
 					return false;
 				}
 			}
@@ -127,7 +130,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						System.Diagnostics.Trace.WriteLine("ERROR[80]: invalid character");
+						comm.errorMsg("ERROR[80]: invalid character");
 						return false;
 					}
 					#endregion
@@ -148,7 +151,7 @@ namespace PlatCPL
 							{
 								if(state.actualTagHasText[state.level])
 								{
-									System.Diagnostics.Trace.WriteLine("ERROR[13]: tag with text and children");
+									comm.errorMsg("ERROR[13]: tag with text and children");
 									return false;
 								}
 								state.actualTagHasChildren[state.level] = true;
@@ -156,7 +159,7 @@ namespace PlatCPL
 							state.level++;
 							if(state.level >= State_XMLfile.MAX_LEVELS)
 							{
-								System.Diagnostics.Trace.WriteLine("ERROR[83]: XML file too deep");
+								comm.errorMsg("ERROR[83]: XML file too deep");
 								return false;
 							}
 							state.actualTagHasAttributes[state.level] = false;
@@ -183,7 +186,7 @@ namespace PlatCPL
 						//TODO: accept ? tags
 						if(state.level>=0)
 						{
-							System.Diagnostics.Trace.WriteLine("ERROR[46]: '<?' tag should be in root level");
+							comm.errorMsg("ERROR[46]: '<?' tag should be in root level");
 							return false;
 						}
 						state.level++;
@@ -200,7 +203,7 @@ namespace PlatCPL
 						//TODO: accept ! tags
 						if(state.level>=0)
 						{
-							System.Diagnostics.Trace.WriteLine("ERROR[67]: '<!' tag should be in root level");
+							comm.errorMsg("ERROR[67]: '<!' tag should be in root level");
 							return false;
 						}
 						state.level++;
@@ -214,7 +217,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						System.Diagnostics.Trace.WriteLine("ERROR[81]: invalid character for tag name");
+						comm.errorMsg("ERROR[81]: invalid character for tag name");
 						return false;
 					}
 					#endregion
@@ -260,7 +263,7 @@ namespace PlatCPL
 								else
 								{
 									//name = ""
-									System.Diagnostics.Trace.WriteLine("ERROR[61]: invalid tag name");
+									comm.errorMsg("ERROR[61]: invalid tag name");
 									return false;
 								}
 							}
@@ -275,7 +278,7 @@ namespace PlatCPL
 								else if(state.actualTagElement.Tag.Length == 0)
 								{
 									//Name = ""
-									System.Diagnostics.Trace.WriteLine("ERROR[73]: invalid tag name");
+									comm.errorMsg("ERROR[73]: invalid tag name");
 									return false;
 								}
 							}
@@ -286,11 +289,12 @@ namespace PlatCPL
 								state.actualArea = State_XMLfile.Area.WaitingForTagClose;
 							else
 								state.actualArea = State_XMLfile.Area.WaitingForAttributeName;
+							comm.infoMsg(state.level+": <"+state.actualTagElement.Tag+">");
 							i++;
 						}
 						else
 						{
-							System.Diagnostics.Trace.WriteLine("ERROR[86]: invalid character in tag name");
+							comm.errorMsg("ERROR[86]: invalid character in tag name");
 							return false;
 						}
 					}
@@ -311,7 +315,7 @@ namespace PlatCPL
 								}
 								else
 								{
-									System.Diagnostics.Trace.WriteLine("ERROR[61]: invalid tag name");
+									comm.errorMsg("ERROR[61]: invalid tag name");
 									return false;
 								}
 							}
@@ -326,7 +330,7 @@ namespace PlatCPL
 								}
 								else if(/*state.actualTagName[state.level]*/state.actualTagElement.Tag.Length == 0)
 								{
-									System.Diagnostics.Trace.WriteLine("ERROR[73]: invalid tag name");
+									comm.errorMsg("ERROR[73]: invalid tag name");
 									return false;
 								}
 							}
@@ -336,19 +340,19 @@ namespace PlatCPL
 								{
 									if(state.actualTagElement.Tag[j] != state.nameBuffer[j])
 									{
-										System.Diagnostics.Trace.WriteLine("ERROR[50]: invalid closing tag name");
+										comm.errorMsg("ERROR[50]: invalid closing tag name");
 										return false;
 									}
 								}
 							}
 							else
 							{
-								System.Diagnostics.Trace.WriteLine("ERROR[50]: invalid closing tag name");
+								comm.errorMsg("ERROR[50]: invalid closing tag name");
 								return false;
 							}
+							comm.infoMsg(state.level+": </"+state.actualTagElement.Tag+">");
 							state.indexBeginName = -1;
 							state.indexNameBuffer = -1;
-							System.Diagnostics.Trace.WriteLine(" - finished with tag: "+state.actualTagElement.Tag);
 							state.level--;
 							state.actualTagElement = state.actualTagElement.parent;
 							state.closingTag = false;
@@ -358,7 +362,7 @@ namespace PlatCPL
 						}
 						else
 						{
-							System.Diagnostics.Trace.WriteLine("ERROR[86]: invalid character in tag name");
+							comm.errorMsg("ERROR[86]: invalid character in tag name");
 							return false;
 						}
 					}
@@ -373,7 +377,6 @@ namespace PlatCPL
 					{
 						state.indexBeginName = -1;
 						state.indexNameBuffer = -1;
-						System.Diagnostics.Trace.WriteLine(" - finished with tag: "+state.actualTagElement.Tag);
 						state.level--;
 						state.actualTagElement = state.actualTagElement.parent;
 						state.closingTag = false;
@@ -383,7 +386,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						System.Diagnostics.Trace.WriteLine("ERROR[47]: invalid character in attributes area");
+						comm.errorMsg("ERROR[47]: invalid character in attributes area");
 						return false;
 					}
 					#endregion
@@ -407,7 +410,7 @@ namespace PlatCPL
 					{
 						if(!state.actualTagHasAttributes[state.level])
 						{
-							System.Diagnostics.Trace.WriteLine("ERROR[99]: invalid character in tag name");
+							comm.errorMsg("ERROR[99]: invalid character in tag name");
 							return false;
 						}
 						else
@@ -437,7 +440,7 @@ namespace PlatCPL
 					else
 					{
 						// > STOP or ...
-						System.Diagnostics.Trace.WriteLine("ERROR[04]: invalid character for attribute name");
+						comm.errorMsg("ERROR[04]: invalid character for attribute name");
 						return false;
 						// > CONTINUE
 						//state.indexBeginName = i;
@@ -463,7 +466,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						System.Diagnostics.Trace.WriteLine("ERROR[87]: invalid character in attributes area");
+						comm.errorMsg("ERROR[87]: invalid character in attributes area");
 						return false;
 					}
 					#endregion
@@ -496,12 +499,12 @@ namespace PlatCPL
 							int nameLength = i-state.indexBeginName;
 							if(nameLength>0)
 							{
-								state.actualAttribute = new XML3(new string(buffer, state.indexBeginName, nameLength), "");
+								state.actualAttribute = new XML3(new string(buffer, state.indexBeginName, nameLength), "", comm);
 								//TODO: add attribute
 							}
 							else
 							{
-								System.Diagnostics.Trace.WriteLine("ERROR[78]: invalid attribute name");
+								comm.errorMsg("ERROR[78]: invalid attribute name");
 								return false;
 							}
 						}
@@ -517,7 +520,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						System.Diagnostics.Trace.WriteLine("ERROR[68]: invalid character in attribute name");
+						comm.errorMsg("ERROR[68]: invalid character in attribute name");
 						return false;
 					}
 					#endregion
@@ -543,7 +546,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						System.Diagnostics.Trace.WriteLine("ERROR[94]: invalid character in tag attributes");
+						comm.errorMsg("ERROR[94]: invalid character in tag attributes");
 						return false;
 					}
 					#endregion
@@ -577,7 +580,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						System.Diagnostics.Trace.WriteLine("ERROR[20]: invalid character for attribute value");
+						comm.errorMsg("ERROR[20]: invalid character for attribute value");
 						return false;
 					}
 					#endregion
@@ -600,7 +603,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						System.Diagnostics.Trace.WriteLine("ERROR[95]: invalid character inside text content of the attribute");
+						comm.errorMsg("ERROR[95]: invalid character inside text content of the attribute");
 						return false;
 					}
 					#endregion
@@ -609,7 +612,7 @@ namespace PlatCPL
 				{
 					#region InAttributeValueNumber: waiting for 'space' or '>'
 					//TODO: attribute number
-					System.Diagnostics.Trace.WriteLine("ERROR[88]: not implemented");
+					comm.errorMsg("ERROR[88]: not implemented");
 					return false;
 					#endregion
 				}
@@ -659,7 +662,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						System.Diagnostics.Trace.WriteLine("ERROR[26]: invalid character inside text content of the tag");
+						comm.errorMsg("ERROR[26]: invalid character inside text content of the tag");
 						return false;
 					}
 					#endregion
@@ -685,7 +688,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						System.Diagnostics.Trace.WriteLine("ERROR[52]: invalid character inside '?' tag");
+						comm.errorMsg("ERROR[52]: invalid character inside '?' tag");
 						return false;
 					}
 					#endregion
@@ -711,7 +714,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						System.Diagnostics.Trace.WriteLine("ERROR[77]: invalid character inside '!' tag");
+						comm.errorMsg("ERROR[77]: invalid character inside '!' tag");
 						return false;
 					}
 					#endregion
@@ -719,13 +722,13 @@ namespace PlatCPL
 				else if(state.actualArea == State_XMLfile.Area.InSpecialTagC)
 				{
 					#region Waiting for -->
-					System.Diagnostics.Trace.WriteLine("ERROR[98]: not implemented");
+					comm.errorMsg("ERROR[98]: not implemented");
 					return false;
 					#endregion
 				}
 				else
 				{
-					System.Diagnostics.Trace.WriteLine("ERROR[94]: invalid state");
+					comm.errorMsg("ERROR[94]: invalid state");
 					return false;
 				}
 				if( i==dataLength )
@@ -857,19 +860,19 @@ namespace PlatCPL
 			}
 			else if(state.actualArea == State_XMLfile.Area.InSpecialTagC)
 			{
-				System.Diagnostics.Trace.WriteLine("ERROR[64]: state not implemented");
+				comm.errorMsg("ERROR[64]: state not implemented");
 				return false;
 			}
 			else
 			{
-				System.Diagnostics.Trace.WriteLine("ERROR[69]: invalid state");
+				comm.errorMsg("ERROR[69]: invalid state");
 				return false;
 			}
 			#endregion
 			if(state.indexBeginName>=0)
 			{
 				//The End Of Buffer treatment failed
-				System.Diagnostics.Trace.WriteLine("ERROR[75]: internal error, some data was lost");
+				comm.errorMsg("ERROR[75]: internal error, some data was lost");
 				return false;
 			}
 			return true;
@@ -900,7 +903,7 @@ namespace PlatCPL
 				catch(System.Exception e)
 				{
 					//comm.porNoLog(e.Message);
-					System.Diagnostics.Trace.WriteLine(e.Message);
+					comm.errorMsg(e.Message);
 				}
 			}
 			if(children.Count>0)
@@ -1070,7 +1073,7 @@ namespace PlatCPL
 		}
 		public XML3 NewChild(string name, string content)
 		{
-			XML3 newChild = new XML3(name, content);
+			XML3 newChild = new XML3(name, content, comm);
 			newChild.parent = this;
 			children.Add(newChild);
 			return newChild;
@@ -1095,7 +1098,7 @@ namespace PlatCPL
 		}
 		public bool AddAttribute(string attribute, string attValue)
 		{
-			XML3 newAttribute = new XML3(attribute, attValue);
+			XML3 newAttribute = new XML3(attribute, attValue, comm);
 			newAttribute.parent = this;
 			attributes.Add(newAttribute);
 			return true;
@@ -1126,9 +1129,11 @@ namespace PlatCPL
 			public PlatCPL.XML3 root;
 			public PlatCPL.XML3 actualTagElement;
 			public PlatCPL.XML3 actualAttribute;
+			public PlatCPL.PcAppHandler comm;
 			
-			public State_XMLfile()
+			public State_XMLfile(PcAppHandler parentComm)
 			{
+				comm = parentComm;
 				reset();
 			}
 			public void reset()
@@ -1142,7 +1147,7 @@ namespace PlatCPL
 				indexBeginName = -1;
 				actualArea = Area.InTopLevelWaitingForRootElement;
 				closingTag = false;
-				root = new PlatCPL.XML3("ROOT","");
+				root = new PlatCPL.XML3("ROOT","", comm);
 				actualTagElement = root;
 			}
 			

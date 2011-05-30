@@ -23,6 +23,7 @@ namespace PlatCPL
 		{
 			InitializeComponent();
 			this.Controls.Add( new PlatCPL.I_PlatCPLv4() );
+			this.Text = "PlatCPLv4";
 		}
 	}
 }

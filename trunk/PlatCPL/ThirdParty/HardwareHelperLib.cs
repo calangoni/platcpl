@@ -256,7 +256,7 @@ namespace HardwareHelperLib
             catch (Exception ex)
             {
                 throw new Exception("Failed to enumerate device tree!", ex);
-                return false;
+                //return false;
             }
             return true;
         }
@@ -391,14 +391,14 @@ namespace HardwareHelperLib
                 if ((!rslt1) || (!rstl2))
                 {
                     throw new Exception("Unable to change device state!");
-                    return false;
+                    //return false;
                 }
                 else
                 {
                     return true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
