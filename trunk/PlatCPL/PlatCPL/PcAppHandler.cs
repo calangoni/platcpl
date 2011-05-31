@@ -33,17 +33,21 @@ namespace PlatCPL
 		{
 			return null;
 		}
-		public void errorMsg(string message)
+		public void msgError(string message)
 		{
 			commParent.showMessage(E.MsgType.Error, message);
 		}
-		public void warnMsg(string message)
+		public void msgWarn(string message)
 		{
 			commParent.showMessage(E.MsgType.Warn, message);
 		}
-		public void infoMsg(string message)
+		public void msgInfo(string message)
 		{
 			commParent.showMessage(E.MsgType.Info, message);
+		}
+		public void msgDebug(string message)
+		{
+			commParent.showMessage(E.MsgType.Debug, message);
 		}
 		public string loadLocalStringNN(string stringIdentifier) // Load application string not null
 		{

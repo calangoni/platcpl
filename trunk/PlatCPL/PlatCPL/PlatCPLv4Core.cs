@@ -44,10 +44,20 @@ namespace PlatCPL
 			//Prepare platform database
 			database = new PlatCPLDatabaseManager(xmlDatabaseFile, comm);
 			//Find all applications
-			apps = PlatCPL.ThirdParty.GetAllClasses(C.S.InterfacesNamespace);
-			//foreach(string interfaceClass in apps) comm.infoMsg("App: "+interfaceClass);
+			apps = findApplications(C.S.InterfacesNamespace);
 		}
 		
+		public System.Collections.Generic.List<string> findApplications(string nameSpace)
+		{
+			System.Collections.Generic.List<string> tempClasses = PlatCPL.ThirdParty.GetAllClasses(nameSpace);
+			Type infoType;
+			for(int i=tempClasses.Count-1; i>=0; i--)
+			{
+				infoType = System.Type.GetType(nameSpace+"."+tempClasses[i], false, false);
+				if(infoType==null || infoType.BaseType.FullName!=C.S.InterfacesBaseType) tempClasses.RemoveAt(i);
+			}
+			return tempClasses;
+		}
 		public PcAppHandler getApplicationInstance(string appName)
 		{
 			if( appName!=null && appName.Length>0 )
@@ -75,8 +85,19 @@ namespace PlatCPL
 					appControl.commParent = appComm;
 					appControl.Dock = System.Windows.Forms.DockStyle.Fill;
 					appControl.MinimumSize = appControl.Size;
-					openWindows.Add( appControl );
-					return appControl;
+					try
+					{
+						if(appControl.PC_Initialize())
+						{
+							openWindows.Add( appControl );
+							return appControl;
+						}
+					}
+					catch(Exception exc)
+					{
+						comm.msgError("ERROR [98]: Could not initialize application\n"+exc.Message);
+					}
+					return null;
 				}
 				else
 				{
@@ -122,6 +143,7 @@ namespace PlatCPL
 			if(type == E.MsgType.Error) System.Diagnostics.Trace.WriteLine("ERROR: "+message);
 			else if(type == E.MsgType.Warn) System.Diagnostics.Trace.WriteLine("WARNING: "+message);
 			else if(type == E.MsgType.Info) System.Diagnostics.Trace.WriteLine(message);
+			else if(type == E.MsgType.Debug) System.Diagnostics.Trace.WriteLine(message);
 			else System.Diagnostics.Trace.WriteLine(message);
 		}
 	}
@@ -163,7 +185,7 @@ namespace PlatCPL
 				{
 					XMLfileName = "";
 					XMLdatabase = new XML3(C.S.Database4Name, comm);
-					comm.errorMsg("Error trying to load: "+XMLfilePath+"\n"+exc.Message);
+					comm.msgError("Error trying to load: "+XMLfilePath+"\n"+exc.Message);
 				}
 			}
 		}

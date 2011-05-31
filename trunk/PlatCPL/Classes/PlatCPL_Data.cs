@@ -28,6 +28,7 @@ namespace PlatCPL
 		{
 			comm = parentComm;
 			Tag = "";
+			//comm.msgDebug(" > new XML3: "+this.Tag);
 			Content = "";
 			children = new System.Collections.Generic.List<XML3>();
 			attributes = new System.Collections.Generic.List<XML3>();
@@ -38,6 +39,7 @@ namespace PlatCPL
 		{
 			comm = parentComm;
 			Tag = name;
+			//comm.msgDebug(" > new XML3: "+this.Tag);
 			if(content!=null)Content = content;
 			else Content = "";
 			children = new System.Collections.Generic.List<XML3>();
@@ -49,6 +51,7 @@ namespace PlatCPL
 		{
 			comm = parentComm;
 			Tag = name;
+			//comm.msgDebug(" > new XML3: "+this.Tag);
 			Content = "";
 			children = new System.Collections.Generic.List<XML3>();
 			attributes = new System.Collections.Generic.List<XML3>();
@@ -72,7 +75,7 @@ namespace PlatCPL
 			}
 			catch(System.Exception exc)
 			{
-				comm.errorMsg(exc.Message);
+				comm.msgError("ERROR[78]: there was a problem opening the XML file\n"+exc.Message);
 				fileStream = null;
 				return false;
 			}
@@ -94,14 +97,34 @@ namespace PlatCPL
 				fileStream.Close();
 				if(resultOK)
 				{
-					return true;
+					if(state.root.NumChildren==1)
+					{
+						//case of simple document
+						this.Tag = state.root.children[0].Tag;
+						this.Content = state.root.children[0].Content;
+						this.children = state.root.children[0].children;
+						this.attributes = state.root.children[0].attributes;
+						return true;
+					}
+					if(state.root.NumChildren==2 && state.root.children[0].Tag=="")
+					{
+						//case of <? ...><tag > document
+						this.Tag = state.root.children[1].Tag;
+						this.Content = state.root.children[1].Content;
+						this.children = state.root.children[1].children;
+						this.attributes = state.root.children[1].attributes;
+						return true;
+					}
+					comm.msgError("ERROR[18]: xml with an unknown configuration of root elements");
+					return false;
 				}
 				else
 				{
-					comm.errorMsg("ERROR[64]: there was a problem reading the XML file");
+					comm.msgError("ERROR[64]: there was a problem parsing the XML file");
 					return false;
 				}
 			}
+			comm.msgError("ERROR[27]: there was a problem opening the XML file");
 			return false;
 		}
 		private bool readXMLstream(char[] buffer, int dataLength, State_XMLfile state)
@@ -130,7 +153,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						comm.errorMsg("ERROR[80]: invalid character");
+						comm.msgError("ERROR[80]: invalid character");
 						return false;
 					}
 					#endregion
@@ -151,7 +174,7 @@ namespace PlatCPL
 							{
 								if(state.actualTagHasText[state.level])
 								{
-									comm.errorMsg("ERROR[13]: tag with text and children");
+									comm.msgError("ERROR[13]: tag with text and children");
 									return false;
 								}
 								state.actualTagHasChildren[state.level] = true;
@@ -159,12 +182,13 @@ namespace PlatCPL
 							state.level++;
 							if(state.level >= State_XMLfile.MAX_LEVELS)
 							{
-								comm.errorMsg("ERROR[83]: XML file too deep");
+								comm.msgError("ERROR[83]: XML file too deep");
 								return false;
 							}
 							state.actualTagHasAttributes[state.level] = false;
 							state.actualTagHasChildren[state.level] = false;
 							state.actualTagHasText[state.level] = false;
+							//comm.msgDebug(" >[a] '"+state.actualTagElement.Tag+"' gets a new child");
 							state.actualTagElement = state.actualTagElement.NewChild("","");
 							//state.actualTagName[state.level] = "";
 						}
@@ -186,13 +210,14 @@ namespace PlatCPL
 						//TODO: accept ? tags
 						if(state.level>=0)
 						{
-							comm.errorMsg("ERROR[46]: '<?' tag should be in root level");
+							comm.msgError("ERROR[46]: '<?' tag should be in root level");
 							return false;
 						}
 						state.level++;
 						state.actualTagHasAttributes[state.level] = false;
 						state.actualTagHasChildren[state.level] = false;
 						state.actualTagHasText[state.level] = false;
+						//comm.msgDebug(" >[b] '"+state.actualTagElement.Tag+"' gets a new '?' child");
 						state.actualTagElement = state.actualTagElement.NewChild("","");
 						state.indexBeginName = -1;
 						state.actualArea = State_XMLfile.Area.InSpecialTagI;
@@ -203,21 +228,22 @@ namespace PlatCPL
 						//TODO: accept ! tags
 						if(state.level>=0)
 						{
-							comm.errorMsg("ERROR[67]: '<!' tag should be in root level");
+							comm.msgError("ERROR[67]: '<!' tag should be in root level");
 							return false;
 						}
 						state.level++;
 						state.actualTagHasAttributes[state.level] = false;
 						state.actualTagHasChildren[state.level] = false;
 						state.actualTagHasText[state.level] = false;
-						state.actualTagElement = state.actualTagElement.NewChild("","");
+						//comm.msgDebug(" >[c] '"+state.actualTagElement.Tag+"' gets a new '!' child");
+						state.actualTagElement = state.actualTagElement.NewChild("!","");
 						state.indexBeginName = -1;
 						state.actualArea = State_XMLfile.Area.InSpecialTagE;
 						i++;
 					}
 					else
 					{
-						comm.errorMsg("ERROR[81]: invalid character for tag name");
+						comm.msgError("ERROR[81]: invalid character for tag name");
 						return false;
 					}
 					#endregion
@@ -263,7 +289,7 @@ namespace PlatCPL
 								else
 								{
 									//name = ""
-									comm.errorMsg("ERROR[61]: invalid tag name");
+									comm.msgError("ERROR[61]: invalid tag name");
 									return false;
 								}
 							}
@@ -278,7 +304,7 @@ namespace PlatCPL
 								else if(state.actualTagElement.Tag.Length == 0)
 								{
 									//Name = ""
-									comm.errorMsg("ERROR[73]: invalid tag name");
+									comm.msgError("ERROR[73]: invalid tag name");
 									return false;
 								}
 							}
@@ -289,12 +315,12 @@ namespace PlatCPL
 								state.actualArea = State_XMLfile.Area.WaitingForTagClose;
 							else
 								state.actualArea = State_XMLfile.Area.WaitingForAttributeName;
-							comm.infoMsg(state.level+": <"+state.actualTagElement.Tag+">");
+							//comm.msgDebug(" >[d] actual tag (level "+state.level+") is: '"+state.actualTagElement.Tag+"'");
 							i++;
 						}
 						else
 						{
-							comm.errorMsg("ERROR[86]: invalid character in tag name");
+							comm.msgError("ERROR[86]: invalid character in tag name");
 							return false;
 						}
 					}
@@ -315,7 +341,7 @@ namespace PlatCPL
 								}
 								else
 								{
-									comm.errorMsg("ERROR[61]: invalid tag name");
+									comm.msgError("ERROR[61]: invalid tag name");
 									return false;
 								}
 							}
@@ -330,7 +356,7 @@ namespace PlatCPL
 								}
 								else if(/*state.actualTagName[state.level]*/state.actualTagElement.Tag.Length == 0)
 								{
-									comm.errorMsg("ERROR[73]: invalid tag name");
+									comm.msgError("ERROR[73]: invalid tag name");
 									return false;
 								}
 							}
@@ -340,21 +366,22 @@ namespace PlatCPL
 								{
 									if(state.actualTagElement.Tag[j] != state.nameBuffer[j])
 									{
-										comm.errorMsg("ERROR[50]: invalid closing tag name");
+										comm.msgError("ERROR[50]: invalid closing tag name");
 										return false;
 									}
 								}
 							}
 							else
 							{
-								comm.errorMsg("ERROR[50]: invalid closing tag name");
+								comm.msgError("ERROR[50]: invalid closing tag name");
 								return false;
 							}
-							comm.infoMsg(state.level+": </"+state.actualTagElement.Tag+">");
+							//comm.msgDebug(" >[e] finished with tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
 							state.indexBeginName = -1;
 							state.indexNameBuffer = -1;
 							state.level--;
 							state.actualTagElement = state.actualTagElement.parent;
+							//comm.msgDebug(" >[f] going back to tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
 							state.closingTag = false;
 							if(state.level>=0)state.actualArea = State_XMLfile.Area.InTagContents;
 							else state.actualArea = State_XMLfile.Area.InTopLevelWaitingForRootElement;
@@ -362,7 +389,7 @@ namespace PlatCPL
 						}
 						else
 						{
-							comm.errorMsg("ERROR[86]: invalid character in tag name");
+							comm.msgError("ERROR[86]: invalid character in tag name");
 							return false;
 						}
 					}
@@ -379,6 +406,7 @@ namespace PlatCPL
 						state.indexNameBuffer = -1;
 						state.level--;
 						state.actualTagElement = state.actualTagElement.parent;
+						//comm.msgDebug(" >[g] going back to tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
 						state.closingTag = false;
 						if(state.level>=0)state.actualArea = State_XMLfile.Area.InTagContents;
 						else state.actualArea = State_XMLfile.Area.InTopLevelWaitingForRootElement;
@@ -386,7 +414,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						comm.errorMsg("ERROR[47]: invalid character in attributes area");
+						comm.msgError("ERROR[47]: invalid character in attributes area");
 						return false;
 					}
 					#endregion
@@ -410,7 +438,7 @@ namespace PlatCPL
 					{
 						if(!state.actualTagHasAttributes[state.level])
 						{
-							comm.errorMsg("ERROR[99]: invalid character in tag name");
+							comm.msgError("ERROR[99]: invalid character in tag name");
 							return false;
 						}
 						else
@@ -440,7 +468,7 @@ namespace PlatCPL
 					else
 					{
 						// > STOP or ...
-						comm.errorMsg("ERROR[04]: invalid character for attribute name");
+						comm.msgError("ERROR[04]: invalid character for attribute name");
 						return false;
 						// > CONTINUE
 						//state.indexBeginName = i;
@@ -466,7 +494,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						comm.errorMsg("ERROR[87]: invalid character in attributes area");
+						comm.msgError("ERROR[87]: invalid character in attributes area");
 						return false;
 					}
 					#endregion
@@ -504,7 +532,7 @@ namespace PlatCPL
 							}
 							else
 							{
-								comm.errorMsg("ERROR[78]: invalid attribute name");
+								comm.msgError("ERROR[78]: invalid attribute name");
 								return false;
 							}
 						}
@@ -520,7 +548,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						comm.errorMsg("ERROR[68]: invalid character in attribute name");
+						comm.msgError("ERROR[68]: invalid character in attribute name");
 						return false;
 					}
 					#endregion
@@ -546,7 +574,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						comm.errorMsg("ERROR[94]: invalid character in tag attributes");
+						comm.msgError("ERROR[94]: invalid character in tag attributes");
 						return false;
 					}
 					#endregion
@@ -580,7 +608,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						comm.errorMsg("ERROR[20]: invalid character for attribute value");
+						comm.msgError("ERROR[20]: invalid character for attribute value");
 						return false;
 					}
 					#endregion
@@ -603,7 +631,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						comm.errorMsg("ERROR[95]: invalid character inside text content of the attribute");
+						comm.msgError("ERROR[95]: invalid character inside text content of the attribute");
 						return false;
 					}
 					#endregion
@@ -612,7 +640,7 @@ namespace PlatCPL
 				{
 					#region InAttributeValueNumber: waiting for 'space' or '>'
 					//TODO: attribute number
-					comm.errorMsg("ERROR[88]: not implemented");
+					comm.msgError("ERROR[88]: not implemented");
 					return false;
 					#endregion
 				}
@@ -662,7 +690,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						comm.errorMsg("ERROR[26]: invalid character inside text content of the tag");
+						comm.msgError("ERROR[26]: invalid character inside text content of the tag");
 						return false;
 					}
 					#endregion
@@ -679,7 +707,10 @@ namespace PlatCPL
 					}
 					if(buffer[i] == '>')
 					{
+						//comm.msgDebug(" >[h] finished with tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
+						state.actualTagElement = state.actualTagElement.parent;
 						state.level--;
+						//comm.msgDebug(" >[i] going back to tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
 						if(state.level>=0)
 							return false;
 						else
@@ -688,7 +719,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						comm.errorMsg("ERROR[52]: invalid character inside '?' tag");
+						comm.msgError("ERROR[52]: invalid character inside '?' tag");
 						return false;
 					}
 					#endregion
@@ -705,7 +736,10 @@ namespace PlatCPL
 					}
 					if(buffer[i] == '>')
 					{
+						//comm.msgDebug(" >[j] finished with tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
+						state.actualTagElement = state.actualTagElement.parent;
 						state.level--;
+						//comm.msgDebug(" >[k] going back to tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
 						if(state.level>=0)
 							return false;
 						else
@@ -714,7 +748,7 @@ namespace PlatCPL
 					}
 					else
 					{
-						comm.errorMsg("ERROR[77]: invalid character inside '!' tag");
+						comm.msgError("ERROR[77]: invalid character inside '!' tag");
 						return false;
 					}
 					#endregion
@@ -722,13 +756,13 @@ namespace PlatCPL
 				else if(state.actualArea == State_XMLfile.Area.InSpecialTagC)
 				{
 					#region Waiting for -->
-					comm.errorMsg("ERROR[98]: not implemented");
+					comm.msgError("ERROR[98]: not implemented");
 					return false;
 					#endregion
 				}
 				else
 				{
-					comm.errorMsg("ERROR[94]: invalid state");
+					comm.msgError("ERROR[94]: invalid state");
 					return false;
 				}
 				if( i==dataLength )
@@ -860,19 +894,19 @@ namespace PlatCPL
 			}
 			else if(state.actualArea == State_XMLfile.Area.InSpecialTagC)
 			{
-				comm.errorMsg("ERROR[64]: state not implemented");
+				comm.msgError("ERROR[64]: state not implemented");
 				return false;
 			}
 			else
 			{
-				comm.errorMsg("ERROR[69]: invalid state");
+				comm.msgError("ERROR[69]: invalid state");
 				return false;
 			}
 			#endregion
 			if(state.indexBeginName>=0)
 			{
 				//The End Of Buffer treatment failed
-				comm.errorMsg("ERROR[75]: internal error, some data was lost");
+				comm.msgError("ERROR[75]: internal error, some data was lost");
 				return false;
 			}
 			return true;
@@ -903,7 +937,7 @@ namespace PlatCPL
 				catch(System.Exception e)
 				{
 					//comm.porNoLog(e.Message);
-					comm.errorMsg(e.Message);
+					comm.msgError(e.Message);
 				}
 			}
 			if(children.Count>0)
