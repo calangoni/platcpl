@@ -18,6 +18,7 @@ namespace PlatCPL
 		public static class S //System constants
 		{
 			public static string InterfacesNamespace = "PlatCPL.Interfaces";
+			public static string InterfacesBaseType = "PlatCPL.PcAppHandler";
 			public static string Database4Name = "PlatCPLv4";
 			public static string DefaultFoldersTag = "DefaultFolder";
 			public static string DefaultFolderTag = "default";
@@ -51,7 +52,8 @@ namespace PlatCPL
 		{
 			Error,
 			Info,
-			Warn
+			Warn,
+			Debug
 		}
 	}
 }

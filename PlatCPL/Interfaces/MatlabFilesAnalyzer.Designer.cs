@@ -55,10 +55,13 @@ namespace PlatCPL.Interfaces
 			this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
+			this.button4 = new System.Windows.Forms.Button();
+			this.panel1 = new System.Windows.Forms.Panel();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
 			this.splitContainer3.Panel1.SuspendLayout();
+			this.splitContainer3.Panel2.SuspendLayout();
 			this.splitContainer3.SuspendLayout();
 			this.splitContainer2.Panel1.SuspendLayout();
 			this.splitContainer2.Panel2.SuspendLayout();
@@ -96,7 +99,7 @@ namespace PlatCPL.Interfaces
 									this.columnHeader7});
 			this.listView1.Location = new System.Drawing.Point(3, 32);
 			this.listView1.Name = "listView1";
-			this.listView1.Size = new System.Drawing.Size(682, 133);
+			this.listView1.Size = new System.Drawing.Size(408, 133);
 			this.listView1.TabIndex = 2;
 			this.listView1.UseCompatibleStateImageBehavior = false;
 			this.listView1.View = System.Windows.Forms.View.Details;
@@ -142,8 +145,13 @@ namespace PlatCPL.Interfaces
 			// splitContainer3.Panel1
 			// 
 			this.splitContainer3.Panel1.Controls.Add(this.splitContainer2);
+			// 
+			// splitContainer3.Panel2
+			// 
+			this.splitContainer3.Panel2.Controls.Add(this.button4);
+			this.splitContainer3.Panel2.Controls.Add(this.panel1);
 			this.splitContainer3.Size = new System.Drawing.Size(718, 339);
-			this.splitContainer3.SplitterDistance = 688;
+			this.splitContainer3.SplitterDistance = 414;
 			this.splitContainer3.TabIndex = 4;
 			// 
 			// splitContainer2
@@ -166,7 +174,7 @@ namespace PlatCPL.Interfaces
 			this.splitContainer2.Panel2.Controls.Add(this.button3);
 			this.splitContainer2.Panel2.Controls.Add(this.button2);
 			this.splitContainer2.Panel2.Controls.Add(this.listView2);
-			this.splitContainer2.Size = new System.Drawing.Size(688, 339);
+			this.splitContainer2.Size = new System.Drawing.Size(414, 339);
 			this.splitContainer2.SplitterDistance = 168;
 			this.splitContainer2.TabIndex = 3;
 			// 
@@ -184,7 +192,7 @@ namespace PlatCPL.Interfaces
 			this.trackBar1.Location = new System.Drawing.Point(165, 3);
 			this.trackBar1.Maximum = 50;
 			this.trackBar1.Name = "trackBar1";
-			this.trackBar1.Size = new System.Drawing.Size(283, 42);
+			this.trackBar1.Size = new System.Drawing.Size(283, 45);
 			this.trackBar1.TabIndex = 2;
 			// 
 			// label1
@@ -227,7 +235,7 @@ namespace PlatCPL.Interfaces
 									this.columnHeader5});
 			this.listView2.Location = new System.Drawing.Point(3, 51);
 			this.listView2.Name = "listView2";
-			this.listView2.Size = new System.Drawing.Size(682, 113);
+			this.listView2.Size = new System.Drawing.Size(408, 113);
 			this.listView2.TabIndex = 0;
 			this.listView2.UseCompatibleStateImageBehavior = false;
 			this.listView2.View = System.Windows.Forms.View.Details;
@@ -257,6 +265,28 @@ namespace PlatCPL.Interfaces
 			this.columnHeader5.Text = "Value";
 			this.columnHeader5.Width = 139;
 			// 
+			// button4
+			// 
+			this.button4.Location = new System.Drawing.Point(3, 3);
+			this.button4.Name = "button4";
+			this.button4.Size = new System.Drawing.Size(75, 23);
+			this.button4.TabIndex = 1;
+			this.button4.Text = "Draw";
+			this.button4.UseVisualStyleBackColor = true;
+			this.button4.Click += new System.EventHandler(this.B_Redraw);
+			// 
+			// panel1
+			// 
+			this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+									| System.Windows.Forms.AnchorStyles.Left) 
+									| System.Windows.Forms.AnchorStyles.Right)));
+			this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.panel1.Location = new System.Drawing.Point(3, 32);
+			this.panel1.Name = "panel1";
+			this.panel1.Size = new System.Drawing.Size(294, 304);
+			this.panel1.TabIndex = 0;
+			this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.Panel1Paint);
+			// 
 			// MatlabFilesAnalyzer
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -268,6 +298,7 @@ namespace PlatCPL.Interfaces
 			this.splitContainer1.Panel2.ResumeLayout(false);
 			this.splitContainer1.ResumeLayout(false);
 			this.splitContainer3.Panel1.ResumeLayout(false);
+			this.splitContainer3.Panel2.ResumeLayout(false);
 			this.splitContainer3.ResumeLayout(false);
 			this.splitContainer2.Panel1.ResumeLayout(false);
 			this.splitContainer2.Panel2.ResumeLayout(false);
@@ -276,6 +307,8 @@ namespace PlatCPL.Interfaces
 			((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
 			this.ResumeLayout(false);
 		}
+		private System.Windows.Forms.Panel panel1;
+		private System.Windows.Forms.Button button4;
 		private System.Windows.Forms.ColumnHeader columnHeader5;
 		private System.Windows.Forms.ColumnHeader columnHeader4;
 		private System.Windows.Forms.ColumnHeader columnHeader3;

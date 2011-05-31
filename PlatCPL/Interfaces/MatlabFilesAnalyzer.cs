@@ -15,16 +15,15 @@ namespace PlatCPL.Interfaces
 	/// </summary>
 	public partial class MatlabFilesAnalyzer : PcAppHandler
 	{
+		System.Drawing.Bitmap graphicImage;
 		public MatlabFilesAnalyzer()
 		{
-			//
-			// The InitializeComponent() call is required for Windows Forms designer support.
-			//
 			InitializeComponent();
-			
-			//
-			// TODO: Add constructor code after the InitializeComponent() call.
-			//
+		}
+		public override bool PC_Initialize()
+		{
+			graphicImage = new System.Drawing.Bitmap(panel1.Size.Width, panel1.Size.Height);
+			return true;
 		}
 		
 		void Button1Click(object sender, EventArgs e)
@@ -99,6 +98,24 @@ namespace PlatCPL.Interfaces
 					}
 				}
 			}
+		}
+		
+		void B_Redraw(object sender, EventArgs e)
+		{
+			if(panel1.Size.Width<50)return;
+			if(panel1.Size.Height<50)return;
+			graphicImage = new System.Drawing.Bitmap(panel1.Width, panel1.Height);
+			System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicImage);
+			g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Tomato, 5), 30, 20, 80, 100);
+			panel1.Invalidate();
+		}
+		
+		void Panel1Paint(object sender, System.Windows.Forms.PaintEventArgs e)
+		{
+			System.Windows.Forms.Panel panel = (System.Windows.Forms.Panel)sender;
+			panel.SuspendLayout();
+			e.Graphics.DrawImage(graphicImage, 0, 0);
+			panel.ResumeLayout();
 		}
 	}
 	
