@@ -22,24 +22,24 @@ namespace PlatCPL
 		//public XML3[] children;
 		//public XML3[] attributes;
 		public XML3 parent = null;
-		private PlatCPL.PcAppHandler comm;
+		private PlatCPL.InterCommunication comm;
 		
-		public XML3(PlatCPL.PcAppHandler parentComm)
+		public XML3(PlatCPL.InterCommunication parentComm)
 		{
 			comm = parentComm;
 			Tag = "";
-			//comm.msgDebug(" > new XML3: "+this.Tag);
+			comm.msgDebug(" > new XML3: "+this.Tag);
 			Content = "";
 			children = new System.Collections.Generic.List<XML3>();
 			attributes = new System.Collections.Generic.List<XML3>();
 			//children = new XML3[0];
 			//attributes = new XML3[0];
 		}
-		public XML3(string name, string content, PlatCPL.PcAppHandler parentComm)
+		public XML3(string name, string content, PlatCPL.InterCommunication parentComm)
 		{
 			comm = parentComm;
 			Tag = name;
-			//comm.msgDebug(" > new XML3: "+this.Tag);
+			comm.msgDebug(" > new XML3: "+this.Tag);
 			if(content!=null)Content = content;
 			else Content = "";
 			children = new System.Collections.Generic.List<XML3>();
@@ -47,11 +47,11 @@ namespace PlatCPL
 			//children = new XML3[0];
 			//attributes = new XML3[0];
 		}
-		public XML3(string name, PlatCPL.PcAppHandler parentComm)
+		public XML3(string name, PlatCPL.InterCommunication parentComm)
 		{
 			comm = parentComm;
 			Tag = name;
-			//comm.msgDebug(" > new XML3: "+this.Tag);
+			comm.msgDebug(" > new XML3: "+this.Tag);
 			Content = "";
 			children = new System.Collections.Generic.List<XML3>();
 			attributes = new System.Collections.Generic.List<XML3>();
@@ -132,7 +132,7 @@ namespace PlatCPL
 			for(int i=0; i<dataLength; )
 			{
 				//TODO: HTML tags with no close: <BR>
-				if(state.actualArea == State_XMLfile.Area.InTopLevelWaitingForRootElement)
+				if(state.actualAreaDbg == State_XMLfile.Area.InTopLevelWaitingForRootElement)
 				{
 					#region InTopLevelWaitingForRootElement: ignore spaces until '<'
 					while( i<dataLength &&
@@ -147,7 +147,7 @@ namespace PlatCPL
 					}
 					if(buffer[i] == '<')
 					{
-						state.actualArea = State_XMLfile.Area.WaitingForTagName;
+						state.actualAreaDbg = State_XMLfile.Area.WaitingForTagName;
 						state.closingTag = false;
 						i++;
 					}
@@ -158,7 +158,7 @@ namespace PlatCPL
 					}
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.WaitingForTagName)
+				else if(state.actualAreaDbg == State_XMLfile.Area.WaitingForTagName)
 				{
 					#region WaitingForTagName: no spaces allowed, next character should be tag name, '!', '?' or '/' (if its a closing tag)
 					// > First character of tag name
@@ -188,12 +188,12 @@ namespace PlatCPL
 							state.actualTagHasAttributes[state.level] = false;
 							state.actualTagHasChildren[state.level] = false;
 							state.actualTagHasText[state.level] = false;
-							//comm.msgDebug(" >[a] '"+state.actualTagElement.Tag+"' gets a new child");
+							comm.msgDebug(" >[a] '"+state.actualTagElement.Tag+"' gets a new child");
 							state.actualTagElement = state.actualTagElement.NewChild("","");
 							//state.actualTagName[state.level] = "";
 						}
 						state.indexBeginName = i;
-						state.actualArea = State_XMLfile.Area.InTagName;
+						state.actualAreaDbg = State_XMLfile.Area.InTagName;
 						i++;
 					}
 					else if(buffer[i] == '/')
@@ -217,10 +217,10 @@ namespace PlatCPL
 						state.actualTagHasAttributes[state.level] = false;
 						state.actualTagHasChildren[state.level] = false;
 						state.actualTagHasText[state.level] = false;
-						//comm.msgDebug(" >[b] '"+state.actualTagElement.Tag+"' gets a new '?' child");
+						comm.msgDebug(" >[b] '"+state.actualTagElement.Tag+"' gets a new '?' child");
 						state.actualTagElement = state.actualTagElement.NewChild("","");
 						state.indexBeginName = -1;
-						state.actualArea = State_XMLfile.Area.InSpecialTagI;
+						state.actualAreaDbg = State_XMLfile.Area.InSpecialTagI;
 						i++;
 					}
 					else if(buffer[i] == '!')
@@ -235,10 +235,10 @@ namespace PlatCPL
 						state.actualTagHasAttributes[state.level] = false;
 						state.actualTagHasChildren[state.level] = false;
 						state.actualTagHasText[state.level] = false;
-						//comm.msgDebug(" >[c] '"+state.actualTagElement.Tag+"' gets a new '!' child");
+						comm.msgDebug(" >[c] '"+state.actualTagElement.Tag+"' gets a new '!' child");
 						state.actualTagElement = state.actualTagElement.NewChild("!","");
 						state.indexBeginName = -1;
-						state.actualArea = State_XMLfile.Area.InSpecialTagE;
+						state.actualAreaDbg = State_XMLfile.Area.InSpecialTagE;
 						i++;
 					}
 					else
@@ -248,7 +248,7 @@ namespace PlatCPL
 					}
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.InTagName)
+				else if(state.actualAreaDbg == State_XMLfile.Area.InTagName)
 				{
 					#region InTagName: read tag name characters until 'space', '>' or '/>'
 					while( i<dataLength &&
@@ -310,12 +310,12 @@ namespace PlatCPL
 							}
 							state.indexBeginName = -1;
 							if(buffer[i] == '>')
-								state.actualArea = State_XMLfile.Area.InTagContents;
+								state.actualAreaDbg = State_XMLfile.Area.InTagContents;
 							else if(buffer[i] == '/')
-								state.actualArea = State_XMLfile.Area.WaitingForTagClose;
+								state.actualAreaDbg = State_XMLfile.Area.WaitingForTagClose;
 							else
-								state.actualArea = State_XMLfile.Area.WaitingForAttributeName;
-							//comm.msgDebug(" >[d] actual tag (level "+state.level+") is: '"+state.actualTagElement.Tag+"'");
+								state.actualAreaDbg = State_XMLfile.Area.WaitingForAttributeName;
+							comm.msgDebug(" >[d] actual tag (level "+state.level+") is: '"+state.actualTagElement.Tag+"'");
 							i++;
 						}
 						else
@@ -376,15 +376,15 @@ namespace PlatCPL
 								comm.msgError("ERROR[50]: invalid closing tag name");
 								return false;
 							}
-							//comm.msgDebug(" >[e] finished with tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
+							comm.msgDebug(" >[e] finished with tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
 							state.indexBeginName = -1;
 							state.indexNameBuffer = -1;
 							state.level--;
 							state.actualTagElement = state.actualTagElement.parent;
-							//comm.msgDebug(" >[f] going back to tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
+							comm.msgDebug(" >[f] going back to tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
 							state.closingTag = false;
-							if(state.level>=0)state.actualArea = State_XMLfile.Area.InTagContents;
-							else state.actualArea = State_XMLfile.Area.InTopLevelWaitingForRootElement;
+							if(state.level>=0)state.actualAreaDbg = State_XMLfile.Area.InTagContents;
+							else state.actualAreaDbg = State_XMLfile.Area.InTopLevelWaitingForRootElement;
 							i++;
 						}
 						else
@@ -396,7 +396,7 @@ namespace PlatCPL
 					
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.WaitingForTagClose)
+				else if(state.actualAreaDbg == State_XMLfile.Area.WaitingForTagClose)
 				{
 					#region WaitingForTagClose: next character should be '>'
 					// case: <tag attrib="content"/>
@@ -406,10 +406,10 @@ namespace PlatCPL
 						state.indexNameBuffer = -1;
 						state.level--;
 						state.actualTagElement = state.actualTagElement.parent;
-						//comm.msgDebug(" >[g] going back to tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
+						comm.msgDebug(" >[g] going back to tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
 						state.closingTag = false;
-						if(state.level>=0)state.actualArea = State_XMLfile.Area.InTagContents;
-						else state.actualArea = State_XMLfile.Area.InTopLevelWaitingForRootElement;
+						if(state.level>=0)state.actualAreaDbg = State_XMLfile.Area.InTagContents;
+						else state.actualAreaDbg = State_XMLfile.Area.InTopLevelWaitingForRootElement;
 						i++;
 					}
 					else
@@ -419,7 +419,7 @@ namespace PlatCPL
 					}
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.WaitingForAttributeName)
+				else if(state.actualAreaDbg == State_XMLfile.Area.WaitingForAttributeName)
 				{
 					#region WaitingForAttributeName: ignore spaces until attribute name, '>' or '/>'
 					// spaces are allowed only if there are attributes: <tag > not allowed
@@ -444,14 +444,14 @@ namespace PlatCPL
 						else
 						{
 							state.indexBeginName = -1;
-							state.actualArea = State_XMLfile.Area.InTagContents;
+							state.actualAreaDbg = State_XMLfile.Area.InTagContents;
 							i++;
 						}
 					}
 					else if(buffer[i] == '/')
 					{
 						state.indexBeginName = -1;
-						state.actualArea = State_XMLfile.Area.WaitingForTagClose;
+						state.actualAreaDbg = State_XMLfile.Area.WaitingForTagClose;
 						i++;
 					}
 					else if((buffer[i] >= 'A' && buffer[i] <= 'Z') ||
@@ -462,7 +462,7 @@ namespace PlatCPL
 					{
 						state.indexBeginName = i;
 						state.actualTagHasAttributes[state.level] = true;
-						state.actualArea = State_XMLfile.Area.InAttributeName;
+						state.actualAreaDbg = State_XMLfile.Area.InAttributeName;
 						i++;
 					}
 					else
@@ -478,7 +478,7 @@ namespace PlatCPL
 					}
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.WaitingForAttributeSpaceOrEnd)
+				else if(state.actualAreaDbg == State_XMLfile.Area.WaitingForAttributeSpaceOrEnd)
 				{
 					#region WaitingForAttributeSpaceOrEnd: there should be at least one space or '>' or '/>'
 					// case not allowed: <tag attrib1="content"attrib2="content">
@@ -489,7 +489,7 @@ namespace PlatCPL
 					   buffer[i] == '>' ||
 					   buffer[i] == '/')
 					{
-						state.actualArea = State_XMLfile.Area.WaitingForAttributeName;
+						state.actualAreaDbg = State_XMLfile.Area.WaitingForAttributeName;
 						//i++; it is just a verification, leave the treatment to the WaitingForAttributeName function
 					}
 					else
@@ -499,7 +499,7 @@ namespace PlatCPL
 					}
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.InAttributeName)
+				else if(state.actualAreaDbg == State_XMLfile.Area.InAttributeName)
 				{
 					#region InAttributeName: waiting for 'space' or '='
 					while( i<dataLength &&
@@ -543,7 +543,7 @@ namespace PlatCPL
 							//state.elements[state.level] += new string(buffer, 0, i);
 						}
 						state.indexBeginName = -1;
-						state.actualArea = State_XMLfile.Area.WaitingForAttributeEqual;
+						state.actualAreaDbg = State_XMLfile.Area.WaitingForAttributeEqual;
 						// i++; not necessary
 					}
 					else
@@ -553,7 +553,7 @@ namespace PlatCPL
 					}
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.WaitingForAttributeEqual)
+				else if(state.actualAreaDbg == State_XMLfile.Area.WaitingForAttributeEqual)
 				{
 					#region WaitingForAttributeEqual: ignore spaces until '='
 					while( i<dataLength &&
@@ -569,7 +569,7 @@ namespace PlatCPL
 					//Next should be '='
 					if(buffer[i] == '=')
 					{
-						state.actualArea = State_XMLfile.Area.WaitingForAttributeValue;
+						state.actualAreaDbg = State_XMLfile.Area.WaitingForAttributeValue;
 						i++;
 					}
 					else
@@ -579,7 +579,7 @@ namespace PlatCPL
 					}
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.WaitingForAttributeValue)
+				else if(state.actualAreaDbg == State_XMLfile.Area.WaitingForAttributeValue)
 				{
 					#region WaitingForAttributeValue: ignore spaces until '"' or 'number'
 					//TODO: there are property values like prop=va.lue (maybe only in HTML, I don't remember)
@@ -597,13 +597,13 @@ namespace PlatCPL
 					if(buffer[i] == '"')
 					{
 						state.indexBeginName = i;
-						state.actualArea = State_XMLfile.Area.InAttributeValueString;
+						state.actualAreaDbg = State_XMLfile.Area.InAttributeValueString;
 						i++;
 					}
 					else if( buffer[i]>='0' && buffer[i]<='9' )
 					{
 						state.indexBeginName = i;
-						state.actualArea = State_XMLfile.Area.InAttributeValueNumber;
+						state.actualAreaDbg = State_XMLfile.Area.InAttributeValueNumber;
 						i++;
 					}
 					else
@@ -613,7 +613,7 @@ namespace PlatCPL
 					}
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.InAttributeValueString)
+				else if(state.actualAreaDbg == State_XMLfile.Area.InAttributeValueString)
 				{
 					#region InAttributeValueString: waiting for '"' (\" allowed?)
 					//TODO: read attribute string. \" allowed?
@@ -626,7 +626,7 @@ namespace PlatCPL
 					if(buffer[i]=='"')
 					{
 						//TODO: store the text
-						state.actualArea = State_XMLfile.Area.WaitingForAttributeSpaceOrEnd;
+						state.actualAreaDbg = State_XMLfile.Area.WaitingForAttributeSpaceOrEnd;
 						i++;
 					}
 					else
@@ -636,7 +636,7 @@ namespace PlatCPL
 					}
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.InAttributeValueNumber)
+				else if(state.actualAreaDbg == State_XMLfile.Area.InAttributeValueNumber)
 				{
 					#region InAttributeValueNumber: waiting for 'space' or '>'
 					//TODO: attribute number
@@ -644,7 +644,7 @@ namespace PlatCPL
 					return false;
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.InTagContents)
+				else if(state.actualAreaDbg == State_XMLfile.Area.InTagContents)
 				{
 					#region InTagContents: waiting for 'text', <child> or </end>
 					//TODO: store spaces in case of being text. Example: <tag>   TEXT   </tag>
@@ -661,19 +661,20 @@ namespace PlatCPL
 					//Next should be '"' or 'number'
 					if(buffer[i] == '<')
 					{
-						state.actualArea = State_XMLfile.Area.WaitingForTagName;
+						state.actualAreaDbg = State_XMLfile.Area.WaitingForTagName;
 						i++;
 					}
 					else
 					{
 						state.indexBeginName = i;
-						state.actualArea = State_XMLfile.Area.InText;
+						state.indexNameBuffer = 0;
+						state.actualAreaDbg = State_XMLfile.Area.InText;
 						state.actualTagHasText[state.level] = true;
 						i++;
 					}
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.InText)
+				else if(state.actualAreaDbg == State_XMLfile.Area.InText)
 				{
 					#region Waiting for </end>
 					while( i<dataLength && (buffer[i]!='<' && buffer[i]!='>') ) i++;
@@ -684,8 +685,41 @@ namespace PlatCPL
 					}
 					if(buffer[i]=='<')
 					{
-						//TODO: store the text
-						state.actualArea = State_XMLfile.Area.WaitingForTagName;
+						//Text finished, next step: store it
+						if(state.indexBeginName>=0)
+						{
+							//The beginning of the text is in the buffer
+							int textLength = i-state.indexBeginName;
+							if(textLength>0)
+							{
+								//text is not null
+								state.actualTagElement.Content +=
+									new string(buffer, state.indexBeginName, textLength);
+							}
+							else
+							{
+								//text = ""
+								comm.msgError("ERROR[03]: invalid text");
+								return false;
+							}
+						}
+						else
+						{
+							//The beginning was already read in some previous buffer, read the rest now
+							if(i>0)
+							{
+								//Name is not null
+								state.actualTagElement.Content += new string(buffer, 0, i);
+							}
+							else if(state.actualTagElement.Content.Length == 0)
+							{
+								//text = ""
+								comm.msgError("ERROR[18]: invalid text");
+								return false;
+							}
+						}
+						state.indexBeginName = -1;
+						state.actualAreaDbg = State_XMLfile.Area.WaitingForTagName;
 						i++;
 					}
 					else
@@ -695,7 +729,7 @@ namespace PlatCPL
 					}
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.InSpecialTagI)
+				else if(state.actualAreaDbg == State_XMLfile.Area.InSpecialTagI)
 				{
 					#region Waiting for ?>
 					//FIXME: search for '?>', not just '>'
@@ -707,14 +741,14 @@ namespace PlatCPL
 					}
 					if(buffer[i] == '>')
 					{
-						//comm.msgDebug(" >[h] finished with tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
+						comm.msgDebug(" >[h] finished with tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
 						state.actualTagElement = state.actualTagElement.parent;
 						state.level--;
-						//comm.msgDebug(" >[i] going back to tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
+						comm.msgDebug(" >[i] going back to tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
 						if(state.level>=0)
 							return false;
 						else
-							state.actualArea = State_XMLfile.Area.InTopLevelWaitingForRootElement;
+							state.actualAreaDbg = State_XMLfile.Area.InTopLevelWaitingForRootElement;
 						i++;
 					}
 					else
@@ -724,7 +758,7 @@ namespace PlatCPL
 					}
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.InSpecialTagE)
+				else if(state.actualAreaDbg == State_XMLfile.Area.InSpecialTagE)
 				{
 					#region Waiting for >
 					//FIXME: verify the contents, not just search for '>'
@@ -736,14 +770,14 @@ namespace PlatCPL
 					}
 					if(buffer[i] == '>')
 					{
-						//comm.msgDebug(" >[j] finished with tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
+						comm.msgDebug(" >[j] finished with tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
 						state.actualTagElement = state.actualTagElement.parent;
 						state.level--;
-						//comm.msgDebug(" >[k] going back to tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
+						comm.msgDebug(" >[k] going back to tag (level "+state.level+"): '"+state.actualTagElement.Tag+"'");
 						if(state.level>=0)
 							return false;
 						else
-							state.actualArea = State_XMLfile.Area.InTopLevelWaitingForRootElement;
+							state.actualAreaDbg = State_XMLfile.Area.InTopLevelWaitingForRootElement;
 						i++;
 					}
 					else
@@ -753,7 +787,7 @@ namespace PlatCPL
 					}
 					#endregion
 				}
-				else if(state.actualArea == State_XMLfile.Area.InSpecialTagC)
+				else if(state.actualAreaDbg == State_XMLfile.Area.InSpecialTagC)
 				{
 					#region Waiting for -->
 					comm.msgError("ERROR[98]: not implemented");
@@ -772,15 +806,15 @@ namespace PlatCPL
 				}
 			}
 			#region Handle the end of the buffer
-			if(state.actualArea == State_XMLfile.Area.InTopLevelWaitingForRootElement)
+			if(state.actualAreaDbg == State_XMLfile.Area.InTopLevelWaitingForRootElement)
 			{
 				//nothing to do
 			}
-			else if(state.actualArea == State_XMLfile.Area.WaitingForTagName)
+			else if(state.actualAreaDbg == State_XMLfile.Area.WaitingForTagName)
 			{
 				//nothing to do
 			}
-			else if(state.actualArea == State_XMLfile.Area.InTagName)
+			else if(state.actualAreaDbg == State_XMLfile.Area.InTagName)
 			{
 				#region InTagName: read tag name characters until 'space', '>' or '/>'
 				if(state.indexBeginName<0)state.indexBeginName=0;
@@ -804,19 +838,19 @@ namespace PlatCPL
 				state.indexBeginName = -1;
 				#endregion
 			}
-			else if(state.actualArea == State_XMLfile.Area.WaitingForTagClose)
+			else if(state.actualAreaDbg == State_XMLfile.Area.WaitingForTagClose)
 			{
 				//nothing to do
 			}
-			else if(state.actualArea == State_XMLfile.Area.WaitingForAttributeName)
+			else if(state.actualAreaDbg == State_XMLfile.Area.WaitingForAttributeName)
 			{
 				//nothing to do
 			}
-			else if(state.actualArea == State_XMLfile.Area.WaitingForAttributeSpaceOrEnd)
+			else if(state.actualAreaDbg == State_XMLfile.Area.WaitingForAttributeSpaceOrEnd)
 			{
 				//nothing to do
 			}
-			else if(state.actualArea == State_XMLfile.Area.InAttributeName)
+			else if(state.actualAreaDbg == State_XMLfile.Area.InAttributeName)
 			{
 				#region InAttributeName: waiting for 'space' or '='
 				if(state.indexBeginName<0)state.indexBeginName=0;
@@ -830,15 +864,15 @@ namespace PlatCPL
 				state.indexBeginName = -1;
 				#endregion
 			}
-			else if(state.actualArea == State_XMLfile.Area.WaitingForAttributeEqual)
+			else if(state.actualAreaDbg == State_XMLfile.Area.WaitingForAttributeEqual)
 			{
 				//nothing to do
 			}
-			else if(state.actualArea == State_XMLfile.Area.WaitingForAttributeValue)
+			else if(state.actualAreaDbg == State_XMLfile.Area.WaitingForAttributeValue)
 			{
 				//nothing to do
 			}
-			else if(state.actualArea == State_XMLfile.Area.InAttributeValueString)
+			else if(state.actualAreaDbg == State_XMLfile.Area.InAttributeValueString)
 			{
 				#region InAttributeValueString: waiting for '"' (\" allowed?)
 				if(state.indexBeginName<0)state.indexBeginName=0;
@@ -851,7 +885,7 @@ namespace PlatCPL
 				state.indexBeginName = -1;
 				#endregion
 			}
-			else if(state.actualArea == State_XMLfile.Area.InAttributeValueNumber)
+			else if(state.actualAreaDbg == State_XMLfile.Area.InAttributeValueNumber)
 			{
 				#region InAttributeValueNumber: waiting for 'space' or '>'
 				if(state.indexBeginName<0)state.indexBeginName=0;
@@ -864,12 +898,12 @@ namespace PlatCPL
 				state.indexBeginName = -1;
 				#endregion
 			}
-			else if(state.actualArea == State_XMLfile.Area.InTagContents)
+			else if(state.actualAreaDbg == State_XMLfile.Area.InTagContents)
 			{
 				//TODO: store the spaces in case of <tag>     Text  </tag>
 				//nothing to do
 			}
-			else if(state.actualArea == State_XMLfile.Area.InText)
+			else if(state.actualAreaDbg == State_XMLfile.Area.InText)
 			{
 				#region Waiting for </end>
 				if(state.indexBeginName<0)state.indexBeginName=0;
@@ -877,22 +911,24 @@ namespace PlatCPL
 				int textLength = i-state.indexBeginName;
 				if(textLength>0)
 				{
-					//TODO: store the text
+					//text is not null
+					state.actualTagElement.Content +=
+						new string(buffer, state.indexBeginName, textLength);
 				}
 				state.indexBeginName = -1;
 				#endregion
 			}
-			else if(state.actualArea == State_XMLfile.Area.InSpecialTagI)
+			else if(state.actualAreaDbg == State_XMLfile.Area.InSpecialTagI)
 			{
 				//TODO: check the contents of the '?' tag
 				//nothing to do for now
 			}
-			else if(state.actualArea == State_XMLfile.Area.InSpecialTagE)
+			else if(state.actualAreaDbg == State_XMLfile.Area.InSpecialTagE)
 			{
 				//TODO: check the contents of the '!' tag
 				//nothing to do for now
 			}
-			else if(state.actualArea == State_XMLfile.Area.InSpecialTagC)
+			else if(state.actualAreaDbg == State_XMLfile.Area.InSpecialTagC)
 			{
 				comm.msgError("ERROR[64]: state not implemented");
 				return false;
@@ -1160,12 +1196,17 @@ namespace PlatCPL
 			public int level;
 			public int indexBeginName;
 			public Area actualArea;
+			public Area actualAreaDbg
+			{
+				get { return actualArea; }
+				set { comm.msgDebug(" new state: "+value); actualArea = value; }
+			}
 			public PlatCPL.XML3 root;
 			public PlatCPL.XML3 actualTagElement;
 			public PlatCPL.XML3 actualAttribute;
-			public PlatCPL.PcAppHandler comm;
+			public PlatCPL.InterCommunication comm;
 			
-			public State_XMLfile(PcAppHandler parentComm)
+			public State_XMLfile(InterCommunication parentComm)
 			{
 				comm = parentComm;
 				reset();
@@ -1179,7 +1220,7 @@ namespace PlatCPL
 				nameBuffer = new char[MAX_CHARS];
 				level = -1;
 				indexBeginName = -1;
-				actualArea = Area.InTopLevelWaitingForRootElement;
+				actualAreaDbg = Area.InTopLevelWaitingForRootElement;
 				closingTag = false;
 				root = new PlatCPL.XML3("ROOT","", comm);
 				actualTagElement = root;

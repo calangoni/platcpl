@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\MDFFileHandler.cs" />
+    <Compile Include="Classes\WorkedData.cs" />
     <Compile Include="Interfaces\MatlabFilesAnalyzer.cs" />
     <Compile Include="Interfaces\MatlabFilesAnalyzer.Designer.cs">
       <DependentUpon>MatlabFilesAnalyzer.cs</DependentUpon>
@@ -113,11 +114,19 @@
     <Compile Include="ThirdParty\matlab\types\MLUInt64.cs" />
     <Compile Include="ThirdParty\matlab\types\MLUint8.cs" />
     <Compile Include="ThirdParty\ThirdParty.cs" />
+    <None Include="Documents\MDFspecificationv03.pdf" />
     <None Include="ThirdParty\zlib.net.dll" />
+    <EmbeddedResource Include="Interfaces\MatlabFilesAnalyzer.resx">
+      <DependentUpon>MatlabFilesAnalyzer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PlatCPL\I_PlatCPLv4.resx">
+      <DependentUpon>I_PlatCPLv4.Designer.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes" />
     <Folder Include="Interfaces" />
+    <Folder Include="Documents" />
     <Folder Include="PlatCPL" />
     <Folder Include="ThirdParty" />
     <Folder Include="ThirdParty\matlab" />

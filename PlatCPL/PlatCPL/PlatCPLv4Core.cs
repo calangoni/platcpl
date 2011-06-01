@@ -26,7 +26,7 @@ namespace PlatCPL
 		public string programUserFolder;
 		public string tempFolder;
 		public string xmlDatabaseFile;
-		public PcAppHandler comm;
+		public InterCommunication comm;
 		
 		public PlatCPLv4()
 		{
@@ -35,8 +35,7 @@ namespace PlatCPL
 			fileOpenDialog = new System.Windows.Forms.OpenFileDialog();
 			fileSaveDialog = new System.Windows.Forms.SaveFileDialog();
 			folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
-			comm = new PcAppHandler();
-			comm.commParent = new InterCommunication(this, -100, this.GetType().Name);
+			comm = new InterCommunication(this, -100, this.GetType().Name);
 			//Define default folders and files
 			findSystemFilesAndFolders();
 			//Prepare log screen
@@ -82,7 +81,7 @@ namespace PlatCPL
 				if( appControl != null )
 				{
 					InterCommunication appComm = new InterCommunication( this, openWindows.Count, appName );
-					appControl.commParent = appComm;
+					appControl.comm = appComm;
 					appControl.Dock = System.Windows.Forms.DockStyle.Fill;
 					appControl.MinimumSize = appControl.Size;
 					try
@@ -151,9 +150,9 @@ namespace PlatCPL
 	{
 		private string XMLfileName;
 		private XML3 XMLdatabase;
-		private PlatCPL.PcAppHandler comm;
+		private PlatCPL.InterCommunication comm;
 
-		public PlatCPLDatabaseManager(string XMLfilePath, PcAppHandler parentComm)
+		public PlatCPLDatabaseManager(string XMLfilePath, InterCommunication parentComm)
 		{
 			comm = parentComm;
 			XMLfileName = "";
@@ -235,29 +234,7 @@ namespace PlatCPL
 			appIdent = appName;
 		}
 		
-		public void showMessage(E.MsgType type, string message)
-		{
-			platform.log.showMessage(type, message);
-		}
-		public string loadSystemConstant(string constantIdentifier)
-		{
-			if( constantIdentifier == C.M.ProgramUserFolder ) return platform.programUserFolder;
-			else
-			{
-				platform.log.showMessage(E.MsgType.Error, "[12] Invalid constant identifier: "+constantIdentifier);
-				return null;
-			}
-		}
-		public string loadLocalString(string stringIdentifier)
-		{
-			return platform.database.loadString(new string[] { C.S.Database4Name, appIdent, stringIdentifier });
-		}
-		public bool saveLocalString(string stringIdentifier, string content)
-		{
-			return platform.database.saveString(new string[] { C.S.Database4Name, appIdent, stringIdentifier }, content);
-		}
-
-		public string[] selectFile(string defaultFolderId, string filter, bool allowMultiple, string title)
+		public string[] selectFileNN(string defaultFolderId, string filter, bool allowMultiple, string title)
 		{
 			platform.fileOpenDialog.FileName = "";
 			platform.fileOpenDialog.Multiselect = allowMultiple;
@@ -318,11 +295,78 @@ namespace PlatCPL
 			}
 			return null;
 		}
-		
-		public object command(string message, object[] parameters)
+
+		public void msgError(string message)
 		{
-			platform.log.showMessage(E.MsgType.Error, "[28] not implemented!");
-			return null;
+			platform.log.showMessage(E.MsgType.Error, message);
+		}
+		public void msgWarn(string message)
+		{
+			platform.log.showMessage(E.MsgType.Warn, message);
+		}
+		public void msgInfo(string message)
+		{
+			platform.log.showMessage(E.MsgType.Info, message);
+		}
+		public void msgDebug(string message)
+		{
+			platform.log.showMessage(E.MsgType.Debug, message);
+		}
+		public string loadLocalStringNN(string stringIdentifier) // Load application string not null
+		{
+			string result = platform.database.loadString(new string[] { C.S.Database4Name, appIdent, stringIdentifier });
+			if(result==null)return "";
+			return result;
+		}
+		public bool saveLocalString(string stringIdentifier, string content)
+		{
+			return platform.database.saveString(new string[] { C.S.Database4Name, appIdent, stringIdentifier }, content);
+		}
+		public string loadSystemConstantNN(string constantIdentifier) // not null
+		{
+			string result = null;
+			if( constantIdentifier == C.M.ProgramUserFolder ) result = platform.programUserFolder;
+			else
+			{
+				platform.log.showMessage(E.MsgType.Error, "[12] Invalid constant identifier: "+constantIdentifier);
+				result = null;
+			}
+			if(result==null)return "";
+			else return result;
+		}
+		public string selectFolderNN()
+		{
+			return selectFolderNN("");
+		}
+		public string selectFolderNN(string folderId) // not null
+		{
+			string result = selectFolder(folderId, "", "Select Folder");
+			if(result==null)return "";
+			else return result;
+		}
+		public string selectFileNN(string filter, string title)
+		{
+			return selectFileNN(filter, title, "");
+		}
+		public string selectFileNN(string filter, string title, string folderId)
+		{
+			string[] result = selectFileNN(folderId, filter, false, title);
+			if(result.Length==0)return "";
+			else return result[0];
+		}
+		public string[] selectFilesNN(string filter, string title)
+		{
+			return selectFilesNN(filter, title, "");
+		}
+		public string[] selectFilesNN(string filter, string title, string folderId)
+		{
+			return selectFileNN(folderId, filter, true, title);
+		}
+		public string createFileNN(string extension)
+		{
+			string resultado = createFile("", extension);
+			if(resultado==null)return "";
+			else return resultado;
 		}
 	}
 }

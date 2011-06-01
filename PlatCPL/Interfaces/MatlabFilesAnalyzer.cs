@@ -7,7 +7,8 @@
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 using System;
-
+using System.Collections.Generic;
+using PlatCPL.Classes;
 namespace PlatCPL.Interfaces
 {
 	/// <summary>
@@ -26,9 +27,9 @@ namespace PlatCPL.Interfaces
 			return true;
 		}
 		
-		void Button1Click(object sender, EventArgs e)
+		void Button1Click(object sender, EventArgs e) // Load
 		{
-			string[] matFilesNames = selectFiles("Mat files (*.mat)|*.mat", "Select files");
+			string[] matFilesNames = comm.selectFilesNN("Mat files (*.mat)|*.mat", "Select files");
 			foreach(string fileName in matFilesNames)
 			{
 				listView1.Items.Add(System.IO.Path.GetFileNameWithoutExtension(fileName)).SubItems.Add(fileName);
@@ -53,10 +54,10 @@ namespace PlatCPL.Interfaces
 						if(infovar.data!=null)
 						{
 							System.Windows.Forms.ListViewItem item = listView2.Items.Add(infovar.name);
-							item.SubItems.Add("");
-							item.SubItems.Add("");
-							item.SubItems.Add("");
-							item.SubItems.Add("");
+							item.SubItems.Add(infovar.minTime.ToString());
+							item.SubItems.Add(infovar.maxTime.ToString());
+							item.SubItems.Add("-");
+							item.SubItems.Add("-");
 							item.Tag = infovar;
 							return true;
 							//infoMsg(" - lines: "+infovar.data.Length);
@@ -131,11 +132,167 @@ namespace PlatCPL.Interfaces
 
 			pictureBox1.Image = graphicImage;
 		}
+		
+		void Button5Click(object sender, EventArgs e)
+		{
+			System.Windows.Forms.ListViewItem item;
+			System.Windows.Forms.ListView listView;
+			listView = listView2;
+			List<double> time = new List<double>();
+			int index;
+			
+			if ( listView.Items.Count == 0 )
+			{
+				return;
+			}
+			
+			#region Create The Time Axis 
+			for ( int i = 0 ; i < listView.Items.Count ; i++ )
+			{
+				item = listView.Items[ i ];
+				if ( item.Tag == null )
+				{
+					continue;
+				}
+				else if ( item.Tag is VariableInfo )
+				{
+					VariableInfo vi = (VariableInfo)item.Tag;
+					for ( int j = 0 ; j < vi.time.Length ; j++ )
+					{
+						if ( ( index = time.BinarySearch( vi.time[ j ] ) ) < 0 ) // insert the value in the axis.
+						{
+							index = Math.Abs( index );
+							if ( index > time.Count )
+							{
+								index = time.Count;
+							}
+							time.Insert( index , vi.time[ j ] );
+							
+						}
+						else 
+						{
+							// do nothing, the value already exists in the axis
+						}
+					}
+				}
+			}
+			#endregion
+			
+			#region Create The Data
+			List<WorkedData> workedDataList = new List<WorkedData>();
+			for ( int i = 0 ; i < listView.Items.Count ; i++ )
+			{
+				item = listView.Items[ i ];
+				if ( item.Tag == null )
+				{
+					continue;
+				}
+				else if ( item.Tag is VariableInfo )
+				{
+					VariableInfo vi = (VariableInfo)item.Tag;
+					WorkedData workedDataItem = new WorkedData( time , item.Text );
+					if ( workedDataItem.CreateData( vi ) )
+					{
+						workedDataList.Add( workedDataItem );
+					}
+					else
+					{
+						//do nothing;
+					}
+				}
+			}
+			#endregion
+			
+			#region Write the ascii File
+			string path = comm.createFile("", ".ascii");
+			System.IO.StreamWriter fileOutput = null;
+			if ( path != null && path.Length > 0 )
+			{
+				try
+				{
+					fileOutput = new System.IO.StreamWriter( path );
+				}
+				catch
+				{
+					//error
+				}
+			}
+			
+			if( fileOutput != null )
+			{
+				// line 1
+				fileOutput.WriteLine( "ETASAsciiItemFile" + "\t" + "record" + "\t" + "CrLf" + "\t" + "Tab" );
+				// -------
+				
+				// line 2
+				fileOutput.Write( "sampleCount" + "\t" + time.Count.ToString() );
+				for ( int i = 15 ; i > time.Count.ToString().Length ; i-- )
+				{
+					fileOutput.Write( " " );
+				}
+				fileOutput.WriteLine();
+				//-------
+				
+				// line 3
+				fileOutput.Write( "time" + "\t" );
+				for ( int i = 0 ; i < workedDataList.Count ; i++ )
+				{
+					fileOutput.Write( workedDataList[ i ].LabelName  + "\t" );
+				}
+				fileOutput.WriteLine();
+				//------
+				
+				// line 4
+				fileOutput.Write( "f8" + "\t" );
+				for ( int i = 0 ; i < workedDataList.Count ; i++ )
+				{
+					fileOutput.Write( "f8" + "\t" );
+				}
+				fileOutput.WriteLine();
+				// ------
+				
+				// line 5
+				fileOutput.Write( "\"s\"" + "\t" );
+				for ( int i = 0 ; i < workedDataList.Count ; i++ )
+				{
+					fileOutput.Write( "\"" + ( i+1 ).ToString() + "\"" + "\t" );
+				}
+				fileOutput.WriteLine();
+				// ------
+				
+				// Data
+				for( int i = 0 ; i < time.Count ; i++ )
+				{
+					fileOutput.Write( time[ i ].ToString() + "\t" );
+					for ( int j = 0 ; j < workedDataList.Count ; j++ )
+					{
+						fileOutput.Write( workedDataList[ j ].Data[ i ].ToString() + "\t" );
+					}
+					fileOutput.WriteLine();
+				}
+				// ------
+				fileOutput.Close();
+			}
+			#endregion
+		}
+		
+		void Button2Click(object sender, EventArgs e) // add
+		{
+			
+		}
+		
+		void Button3Click(object sender, EventArgs e) // remove
+		{
+			
+		}
 	}
 	
 	public class VariableInfo
 	{
-		public double[][] data;
+		public double maxTime;
+		public double minTime;
+		public double[] time;
+		public double[] data;
 		public string name;
 		
 		public VariableInfo(string variableName, csmatio.types.MLArray matlabArray)
@@ -144,26 +301,57 @@ namespace PlatCPL.Interfaces
 			if(matlabArray.IsDouble)
 			{
 				csmatio.types.MLDouble temp = (csmatio.types.MLDouble)matlabArray;
-				data = temp.GetArray();
-				if(data.Length!=2) data=null;
-				else if(data[0].Length<2) data=null;
-				//infoMsg(" - lines: "+dados.Length);
-				//infoMsg(" - columns: "+dados[0].Length);
+				double[][] tempData = temp.GetArray();
+				if(tempData.Length!=2)
+				{
+					time = null;
+					data = null;
+					maxTime = 0;
+					minTime = 0;
+				}
+				else if(tempData.Length<2)
+				{
+					time = null;
+					data = null;
+					maxTime = 0;
+					minTime = 0;
+				}
+				else
+				{
+					time = tempData[0];
+					data = tempData[1];
+					maxTime = time[time.Length-1];
+					minTime = time[0];
+				}
 			}
 		}
 		public string GetInterpStrVal(double timeVal)
 		{
-			if(data==null)return "-";
+			if(data==null||time==null)return "-";
 			int i;
-			for(i=0; i<data[0].Length; i++)
+			for(i=0; i<time.Length; i++)
 			{
-				if(timeVal<=data[0][i])break;
+				if(timeVal<=time[i])break;
 			}
-			if(timeVal==data[0][i])return data[1][i].ToString();
-			if(i>=data[0].Length)return "-";
+			if(timeVal==time[i])return data[i].ToString();
+			if(i>=time.Length)return "-";
 			if(i<=0)return "-";
-			double result = (timeVal-data[0][i-1])/(data[0][i]-data[0][i-1])*(data[1][i]-data[1][i-1])+data[1][i-1];
+			double result = (timeVal-time[i-1])/(time[i]-time[i-1])*(data[i]-data[i-1])+data[i-1];
 			return result.ToString();
+		}
+		public double GetInterpVal(double timeVal)
+		{
+			//if(data==null||time==null)return 0;
+			int i;
+			for(i=0; i<time.Length; i++)
+			{
+				if(timeVal<=time[i])break;
+			}
+			if(timeVal==time[i])return data[i];
+			if(i>=time.Length)return data[data.Length-1];
+			if(i<=0)return data[0];
+			double result = (timeVal-time[i-1])/(time[i]-time[i-1])*(data[i]-data[i-1])+data[i-1];
+			return result;
 		}
 	}
 }

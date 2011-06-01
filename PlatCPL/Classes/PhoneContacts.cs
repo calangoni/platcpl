@@ -19,9 +19,9 @@ namespace PlatCPL.Classes
 		public string category;
 		public System.Collections.Generic.List<ContactNumberInfo> numbers;
 		public XML3 otherFields;
-		private PlatCPL.PcAppHandler comm;
+		private PlatCPL.InterCommunication comm;
 		
-		public PhoneContact(string contactName, PlatCPL.PcAppHandler parentComm)
+		public PhoneContact(string contactName, PlatCPL.InterCommunication parentComm)
 		{
 			comm = parentComm;
 			name = contactName;
