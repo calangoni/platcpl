@@ -39,6 +39,7 @@ namespace PlatCPL
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabPage1 = new System.Windows.Forms.TabPage();
 			this.comboBox1 = new System.Windows.Forms.ComboBox();
+			this.button1 = new System.Windows.Forms.Button();
 			this.tabControl1.SuspendLayout();
 			this.tabPage1.SuspendLayout();
 			this.SuspendLayout();
@@ -57,6 +58,7 @@ namespace PlatCPL
 			// 
 			// tabPage1
 			// 
+			this.tabPage1.Controls.Add(this.button1);
 			this.tabPage1.Controls.Add(this.comboBox1);
 			this.tabPage1.Location = new System.Drawing.Point(4, 22);
 			this.tabPage1.Name = "tabPage1";
@@ -75,6 +77,16 @@ namespace PlatCPL
 			this.comboBox1.TabIndex = 3;
 			this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.ComboBox1SelectedIndexChanged);
 			// 
+			// button1
+			// 
+			this.button1.Location = new System.Drawing.Point(178, 20);
+			this.button1.Name = "button1";
+			this.button1.Size = new System.Drawing.Size(75, 23);
+			this.button1.TabIndex = 4;
+			this.button1.Text = "Test";
+			this.button1.UseVisualStyleBackColor = true;
+			this.button1.Click += new System.EventHandler(this.Button1Click);
+			// 
 			// I_PlatCPLv4
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -86,6 +98,7 @@ namespace PlatCPL
 			this.tabPage1.ResumeLayout(false);
 			this.ResumeLayout(false);
 		}
+		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.ComboBox comboBox1;
 		private System.Windows.Forms.TabPage tabPage1;
 		private System.Windows.Forms.TabControl tabControl1;

@@ -56,7 +56,7 @@ namespace PlatCPL.Interfaces
 			this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
 			this.button4 = new System.Windows.Forms.Button();
-			this.panel1 = new System.Windows.Forms.Panel();
+			this.pictureBox1 = new System.Windows.Forms.PictureBox();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
@@ -67,6 +67,7 @@ namespace PlatCPL.Interfaces
 			this.splitContainer2.Panel2.SuspendLayout();
 			this.splitContainer2.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// button1
@@ -148,8 +149,8 @@ namespace PlatCPL.Interfaces
 			// 
 			// splitContainer3.Panel2
 			// 
+			this.splitContainer3.Panel2.Controls.Add(this.pictureBox1);
 			this.splitContainer3.Panel2.Controls.Add(this.button4);
-			this.splitContainer3.Panel2.Controls.Add(this.panel1);
 			this.splitContainer3.Size = new System.Drawing.Size(718, 339);
 			this.splitContainer3.SplitterDistance = 414;
 			this.splitContainer3.TabIndex = 4;
@@ -275,17 +276,17 @@ namespace PlatCPL.Interfaces
 			this.button4.UseVisualStyleBackColor = true;
 			this.button4.Click += new System.EventHandler(this.B_Redraw);
 			// 
-			// panel1
+			// pictureBox1
 			// 
-			this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+			this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
 									| System.Windows.Forms.AnchorStyles.Left) 
 									| System.Windows.Forms.AnchorStyles.Right)));
-			this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.panel1.Location = new System.Drawing.Point(3, 32);
-			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(294, 304);
-			this.panel1.TabIndex = 0;
-			this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.Panel1Paint);
+			this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pictureBox1.Location = new System.Drawing.Point(3, 32);
+			this.pictureBox1.Name = "pictureBox1";
+			this.pictureBox1.Size = new System.Drawing.Size(294, 304);
+			this.pictureBox1.TabIndex = 0;
+			this.pictureBox1.TabStop = false;
 			// 
 			// MatlabFilesAnalyzer
 			// 
@@ -305,9 +306,10 @@ namespace PlatCPL.Interfaces
 			this.splitContainer2.Panel2.PerformLayout();
 			this.splitContainer2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			this.ResumeLayout(false);
 		}
-		private System.Windows.Forms.Panel panel1;
+		private System.Windows.Forms.PictureBox pictureBox1;
 		private System.Windows.Forms.Button button4;
 		private System.Windows.Forms.ColumnHeader columnHeader5;
 		private System.Windows.Forms.ColumnHeader columnHeader4;

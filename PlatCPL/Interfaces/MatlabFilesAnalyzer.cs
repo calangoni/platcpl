@@ -22,7 +22,7 @@ namespace PlatCPL.Interfaces
 		}
 		public override bool PC_Initialize()
 		{
-			graphicImage = new System.Drawing.Bitmap(panel1.Size.Width, panel1.Size.Height);
+			graphicImage = new System.Drawing.Bitmap(pictureBox1.Width, pictureBox1.Height);
 			return true;
 		}
 		
@@ -102,20 +102,34 @@ namespace PlatCPL.Interfaces
 		
 		void B_Redraw(object sender, EventArgs e)
 		{
-			if(panel1.Size.Width<50)return;
-			if(panel1.Size.Height<50)return;
-			graphicImage = new System.Drawing.Bitmap(panel1.Width, panel1.Height);
+			if(pictureBox1.Width<50)return;
+			if(pictureBox1.Height<50)return;
+			if(pictureBox1.BorderStyle == System.Windows.Forms.BorderStyle.FixedSingle)
+				graphicImage = new System.Drawing.Bitmap(pictureBox1.Width-2, pictureBox1.Height-2);
+			else graphicImage = new System.Drawing.Bitmap(pictureBox1.Width, pictureBox1.Height);
 			System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicImage);
-			g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Tomato, 5), 30, 20, 80, 100);
-			panel1.Invalidate();
-		}
-		
-		void Panel1Paint(object sender, System.Windows.Forms.PaintEventArgs e)
-		{
-			System.Windows.Forms.Panel panel = (System.Windows.Forms.Panel)sender;
-			panel.SuspendLayout();
-			e.Graphics.DrawImage(graphicImage, 0, 0);
-			panel.ResumeLayout();
+			
+			System.Drawing.Pen penBlack = new System.Drawing.Pen(System.Drawing.Color.Black, 1);
+			int numGraphs = 5;
+			int graphSpacing = 5;
+			int totalDeadSpace = (numGraphs+1)*graphSpacing;
+			int graphsHeight = (int)System.Math.Floor( (double)(graphicImage.Height-totalDeadSpace)/numGraphs );
+			int graphsWidth = graphicImage.Width - 2*graphSpacing;
+			int gy;
+			int gx;
+			if(graphsHeight>10)
+			{
+				for(int i=0; i<numGraphs; i++)
+				{
+					gy = (i+1)*graphSpacing + i*graphsHeight;
+					gx = graphSpacing;
+					g.DrawRectangle(penBlack, gx-1, gy-1, graphsWidth+2, graphsHeight+2);
+				}
+			}
+			//Draw main border
+			g.DrawRectangle(penBlack, 0, 0, graphicImage.Width-1, graphicImage.Height-1);
+
+			pictureBox1.Image = graphicImage;
 		}
 	}
 	

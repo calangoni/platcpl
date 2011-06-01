@@ -59,6 +59,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\MDFFileHandler.cs" />
     <Compile Include="Interfaces\MatlabFilesAnalyzer.cs" />
     <Compile Include="Interfaces\MatlabFilesAnalyzer.Designer.cs">
       <DependentUpon>MatlabFilesAnalyzer.cs</DependentUpon>
@@ -113,12 +114,6 @@
     <Compile Include="ThirdParty\matlab\types\MLUint8.cs" />
     <Compile Include="ThirdParty\ThirdParty.cs" />
     <None Include="ThirdParty\zlib.net.dll" />
-    <EmbeddedResource Include="Interfaces\MatlabFilesAnalyzer.resx">
-      <DependentUpon>MatlabFilesAnalyzer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes" />
