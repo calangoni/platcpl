@@ -25,7 +25,7 @@ namespace PlatCPL.Interfaces
 
 		public void B_loadP2Kfile(object sender, EventArgs e)
 		{
-			string filePath = selectFile("CSV file (*.csv)|*.csv","Select file");
+			string filePath = comm.selectFileNN("CSV file (*.csv)|*.csv","Select file");
 			System.IO.StreamReader fileStream = new System.IO.StreamReader(filePath, System.Text.Encoding.Default, true);
 			string line = fileStream.ReadLine();
 			string[] lineParts, nameParts;
@@ -37,7 +37,7 @@ namespace PlatCPL.Interfaces
 				{
 					if(lineParts[0] == "CATEGORY")
 					{
-						if(lineParts.Length != 5)msgError("ERROR 36");
+						if(lineParts.Length != 5)comm.msgError("ERROR 36");
 						else categories.Add(lineParts[2]);
 					}
 					else if(lineParts[0] == "PHONE")
@@ -93,9 +93,9 @@ namespace PlatCPL.Interfaces
 						}
 						lineParts[2] = nameParts[0];
 						for(int i=1; i<nameParts.Length; i++) lineParts[2] += " "+nameParts[i];
-						msgInfo(lineParts[2]+","+lineParts[2]+",,,,,,,,,,,,,,,,,,,,,,,,,* My Contacts,"+lineParts[4]+","+lineParts[3]+",,,,,,,,,,");
+						comm.msgInfo(lineParts[2]+","+lineParts[2]+",,,,,,,,,,,,,,,,,,,,,,,,,* My Contacts,"+lineParts[4]+","+lineParts[3]+",,,,,,,,,,");
 					}
-					else msgError("ERROR 42");
+					else comm.msgError("ERROR 42");
 				}
 				line = fileStream.ReadLine();
 			}

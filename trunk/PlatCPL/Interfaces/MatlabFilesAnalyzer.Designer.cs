@@ -44,6 +44,7 @@ namespace PlatCPL.Interfaces
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.splitContainer3 = new System.Windows.Forms.SplitContainer();
 			this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+			this.button5 = new System.Windows.Forms.Button();
 			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.trackBar1 = new System.Windows.Forms.TrackBar();
 			this.label1 = new System.Windows.Forms.Label();
@@ -55,8 +56,8 @@ namespace PlatCPL.Interfaces
 			this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
-			this.button4 = new System.Windows.Forms.Button();
 			this.pictureBox1 = new System.Windows.Forms.PictureBox();
+			this.button4 = new System.Windows.Forms.Button();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
@@ -100,7 +101,7 @@ namespace PlatCPL.Interfaces
 									this.columnHeader7});
 			this.listView1.Location = new System.Drawing.Point(3, 32);
 			this.listView1.Name = "listView1";
-			this.listView1.Size = new System.Drawing.Size(408, 133);
+			this.listView1.Size = new System.Drawing.Size(622, 133);
 			this.listView1.TabIndex = 2;
 			this.listView1.UseCompatibleStateImageBehavior = false;
 			this.listView1.View = System.Windows.Forms.View.Details;
@@ -152,7 +153,7 @@ namespace PlatCPL.Interfaces
 			this.splitContainer3.Panel2.Controls.Add(this.pictureBox1);
 			this.splitContainer3.Panel2.Controls.Add(this.button4);
 			this.splitContainer3.Size = new System.Drawing.Size(718, 339);
-			this.splitContainer3.SplitterDistance = 414;
+			this.splitContainer3.SplitterDistance = 628;
 			this.splitContainer3.TabIndex = 4;
 			// 
 			// splitContainer2
@@ -169,15 +170,26 @@ namespace PlatCPL.Interfaces
 			// 
 			// splitContainer2.Panel2
 			// 
+			this.splitContainer2.Panel2.Controls.Add(this.button5);
 			this.splitContainer2.Panel2.Controls.Add(this.textBox1);
 			this.splitContainer2.Panel2.Controls.Add(this.trackBar1);
 			this.splitContainer2.Panel2.Controls.Add(this.label1);
 			this.splitContainer2.Panel2.Controls.Add(this.button3);
 			this.splitContainer2.Panel2.Controls.Add(this.button2);
 			this.splitContainer2.Panel2.Controls.Add(this.listView2);
-			this.splitContainer2.Size = new System.Drawing.Size(414, 339);
+			this.splitContainer2.Size = new System.Drawing.Size(628, 339);
 			this.splitContainer2.SplitterDistance = 168;
 			this.splitContainer2.TabIndex = 3;
+			// 
+			// button5
+			// 
+			this.button5.Location = new System.Drawing.Point(576, 7);
+			this.button5.Name = "button5";
+			this.button5.Size = new System.Drawing.Size(38, 23);
+			this.button5.TabIndex = 4;
+			this.button5.Text = "Export2Ascii";
+			this.button5.UseVisualStyleBackColor = true;
+			this.button5.Click += new System.EventHandler(this.Button5Click);
 			// 
 			// textBox1
 			// 
@@ -193,7 +205,7 @@ namespace PlatCPL.Interfaces
 			this.trackBar1.Location = new System.Drawing.Point(165, 3);
 			this.trackBar1.Maximum = 50;
 			this.trackBar1.Name = "trackBar1";
-			this.trackBar1.Size = new System.Drawing.Size(283, 45);
+			this.trackBar1.Size = new System.Drawing.Size(283, 42);
 			this.trackBar1.TabIndex = 2;
 			// 
 			// label1
@@ -213,6 +225,7 @@ namespace PlatCPL.Interfaces
 			this.button3.TabIndex = 0;
 			this.button3.Text = "Remove";
 			this.button3.UseVisualStyleBackColor = true;
+			this.button3.Click += new System.EventHandler(this.Button3Click);
 			// 
 			// button2
 			// 
@@ -222,6 +235,7 @@ namespace PlatCPL.Interfaces
 			this.button2.TabIndex = 0;
 			this.button2.Text = "Add";
 			this.button2.UseVisualStyleBackColor = true;
+			this.button2.Click += new System.EventHandler(this.Button2Click);
 			// 
 			// listView2
 			// 
@@ -236,7 +250,7 @@ namespace PlatCPL.Interfaces
 									this.columnHeader5});
 			this.listView2.Location = new System.Drawing.Point(3, 51);
 			this.listView2.Name = "listView2";
-			this.listView2.Size = new System.Drawing.Size(408, 113);
+			this.listView2.Size = new System.Drawing.Size(622, 113);
 			this.listView2.TabIndex = 0;
 			this.listView2.UseCompatibleStateImageBehavior = false;
 			this.listView2.View = System.Windows.Forms.View.Details;
@@ -266,6 +280,18 @@ namespace PlatCPL.Interfaces
 			this.columnHeader5.Text = "Value";
 			this.columnHeader5.Width = 139;
 			// 
+			// pictureBox1
+			// 
+			this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+									| System.Windows.Forms.AnchorStyles.Left) 
+									| System.Windows.Forms.AnchorStyles.Right)));
+			this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.pictureBox1.Location = new System.Drawing.Point(3, 32);
+			this.pictureBox1.Name = "pictureBox1";
+			this.pictureBox1.Size = new System.Drawing.Size(80, 304);
+			this.pictureBox1.TabIndex = 0;
+			this.pictureBox1.TabStop = false;
+			// 
 			// button4
 			// 
 			this.button4.Location = new System.Drawing.Point(3, 3);
@@ -275,18 +301,6 @@ namespace PlatCPL.Interfaces
 			this.button4.Text = "Draw";
 			this.button4.UseVisualStyleBackColor = true;
 			this.button4.Click += new System.EventHandler(this.B_Redraw);
-			// 
-			// pictureBox1
-			// 
-			this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-									| System.Windows.Forms.AnchorStyles.Left) 
-									| System.Windows.Forms.AnchorStyles.Right)));
-			this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pictureBox1.Location = new System.Drawing.Point(3, 32);
-			this.pictureBox1.Name = "pictureBox1";
-			this.pictureBox1.Size = new System.Drawing.Size(294, 304);
-			this.pictureBox1.TabIndex = 0;
-			this.pictureBox1.TabStop = false;
 			// 
 			// MatlabFilesAnalyzer
 			// 
@@ -309,6 +323,7 @@ namespace PlatCPL.Interfaces
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			this.ResumeLayout(false);
 		}
+		private System.Windows.Forms.Button button5;
 		private System.Windows.Forms.PictureBox pictureBox1;
 		private System.Windows.Forms.Button button4;
 		private System.Windows.Forms.ColumnHeader columnHeader5;

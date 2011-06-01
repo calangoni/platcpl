@@ -19,7 +19,7 @@ namespace PlatCPL
 	public partial class I_PlatCPLv4 : UserControl
 	{
 		PlatCPLv4 platform;
-		PcAppHandler comm;
+		InterCommunication comm;
 		
 		public I_PlatCPLv4()
 		{
@@ -87,12 +87,6 @@ namespace PlatCPL
 					}
 				}
 			}
-		}
-		
-		void Button1Click(object sender, EventArgs e)
-		{
-			PlatCPL.Classes.MDFFileHandler manager = new PlatCPL.Classes.MDFFileHandler();
-			manager.realMdfFile(comm.selectFile("*.dat|*.dat","Select file"));
 		}
 	}
 }
