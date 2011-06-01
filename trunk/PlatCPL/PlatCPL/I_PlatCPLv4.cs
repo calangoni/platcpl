@@ -19,11 +19,13 @@ namespace PlatCPL
 	public partial class I_PlatCPLv4 : UserControl
 	{
 		PlatCPLv4 platform;
+		PcAppHandler comm;
 		
 		public I_PlatCPLv4()
 		{
 			InitializeComponent();
 			platform = new PlatCPLv4();
+			comm = platform.comm;
 			fillComboBox();
 			//Select user applications
 			selecionarPerfil("");
@@ -85,6 +87,12 @@ namespace PlatCPL
 					}
 				}
 			}
+		}
+		
+		void Button1Click(object sender, EventArgs e)
+		{
+			PlatCPL.Classes.MDFFileHandler manager = new PlatCPL.Classes.MDFFileHandler();
+			manager.realMdfFile(comm.selectFile("*.dat|*.dat","Select file"));
 		}
 	}
 }
