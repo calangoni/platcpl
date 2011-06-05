@@ -27,7 +27,7 @@ namespace PlatCPL.Interfaces
 			return true;
 		}
 		
-		void Button1Click(object sender, EventArgs e) // Load
+		void B_Load(object sender, EventArgs e) // Load
 		{
 			string[] matFilesNames = comm.selectFilesNN("Mat files (*.mat)|*.mat", "Select files");
 			foreach(string fileName in matFilesNames)
@@ -133,7 +133,7 @@ namespace PlatCPL.Interfaces
 			pictureBox1.Image = graphicImage;
 		}
 		
-		void Button5Click(object sender, EventArgs e)
+		void B_Export(object sender, EventArgs e)
 		{
 			System.Windows.Forms.ListViewItem item;
 			System.Windows.Forms.ListView listView;
@@ -178,7 +178,7 @@ namespace PlatCPL.Interfaces
 			}
 			#endregion
 			
-			#region Create The Data
+			#region Create The Data with the new time axis
 			List<WorkedData> workedDataList = new List<WorkedData>();
 			for ( int i = 0 ; i < listView.Items.Count ; i++ )
 			{
@@ -199,6 +199,17 @@ namespace PlatCPL.Interfaces
 					{
 						//do nothing;
 					}
+				}
+			}
+			#endregion
+			
+			#region Write the dat file
+			MDFFileHandler datManager = new MDFFileHandler();
+			if(datManager.fillMdfData(workedDataList, time))
+			{
+				if(datManager.exportToMdfFile(comm.createFileNN(".dat")))
+				{
+					return;
 				}
 			}
 			#endregion
@@ -276,14 +287,25 @@ namespace PlatCPL.Interfaces
 			#endregion
 		}
 		
-		void Button2Click(object sender, EventArgs e) // add
+		void B_Add(object sender, EventArgs e) // add
 		{
 			
 		}
 		
-		void Button3Click(object sender, EventArgs e) // remove
+		void B_Remove(object sender, EventArgs e) // remove
 		{
 			
+		}
+		
+		void B_Test(object sender, EventArgs e) // test
+		{
+			MDFFileHandler manager = new MDFFileHandler();
+			string fileName = comm.selectFileNN("*.dat|*.dat","Select file");
+			bool result = false;
+			if(fileName.Length>0)
+			{
+				result = manager.readMdfFile(fileName);
+			}
 		}
 	}
 	
