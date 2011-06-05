@@ -58,6 +58,7 @@ namespace PlatCPL.Interfaces
 			this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
 			this.pictureBox1 = new System.Windows.Forms.PictureBox();
 			this.button4 = new System.Windows.Forms.Button();
+			this.button6 = new System.Windows.Forms.Button();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
@@ -79,7 +80,7 @@ namespace PlatCPL.Interfaces
 			this.button1.TabIndex = 0;
 			this.button1.Text = "Open";
 			this.button1.UseVisualStyleBackColor = true;
-			this.button1.Click += new System.EventHandler(this.Button1Click);
+			this.button1.Click += new System.EventHandler(this.B_Load);
 			// 
 			// richTextBox1
 			// 
@@ -165,6 +166,7 @@ namespace PlatCPL.Interfaces
 			// 
 			// splitContainer2.Panel1
 			// 
+			this.splitContainer2.Panel1.Controls.Add(this.button6);
 			this.splitContainer2.Panel1.Controls.Add(this.listView1);
 			this.splitContainer2.Panel1.Controls.Add(this.button1);
 			// 
@@ -189,7 +191,7 @@ namespace PlatCPL.Interfaces
 			this.button5.TabIndex = 4;
 			this.button5.Text = "Export2Ascii";
 			this.button5.UseVisualStyleBackColor = true;
-			this.button5.Click += new System.EventHandler(this.Button5Click);
+			this.button5.Click += new System.EventHandler(this.B_Export);
 			// 
 			// textBox1
 			// 
@@ -205,7 +207,7 @@ namespace PlatCPL.Interfaces
 			this.trackBar1.Location = new System.Drawing.Point(165, 3);
 			this.trackBar1.Maximum = 50;
 			this.trackBar1.Name = "trackBar1";
-			this.trackBar1.Size = new System.Drawing.Size(283, 42);
+			this.trackBar1.Size = new System.Drawing.Size(283, 45);
 			this.trackBar1.TabIndex = 2;
 			// 
 			// label1
@@ -225,7 +227,7 @@ namespace PlatCPL.Interfaces
 			this.button3.TabIndex = 0;
 			this.button3.Text = "Remove";
 			this.button3.UseVisualStyleBackColor = true;
-			this.button3.Click += new System.EventHandler(this.Button3Click);
+			this.button3.Click += new System.EventHandler(this.B_Remove);
 			// 
 			// button2
 			// 
@@ -235,7 +237,7 @@ namespace PlatCPL.Interfaces
 			this.button2.TabIndex = 0;
 			this.button2.Text = "Add";
 			this.button2.UseVisualStyleBackColor = true;
-			this.button2.Click += new System.EventHandler(this.Button2Click);
+			this.button2.Click += new System.EventHandler(this.B_Add);
 			// 
 			// listView2
 			// 
@@ -302,6 +304,16 @@ namespace PlatCPL.Interfaces
 			this.button4.UseVisualStyleBackColor = true;
 			this.button4.Click += new System.EventHandler(this.B_Redraw);
 			// 
+			// button6
+			// 
+			this.button6.Location = new System.Drawing.Point(84, 3);
+			this.button6.Name = "button6";
+			this.button6.Size = new System.Drawing.Size(75, 23);
+			this.button6.TabIndex = 3;
+			this.button6.Text = "Test";
+			this.button6.UseVisualStyleBackColor = true;
+			this.button6.Click += new System.EventHandler(this.B_Test);
+			// 
 			// MatlabFilesAnalyzer
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -323,6 +335,7 @@ namespace PlatCPL.Interfaces
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			this.ResumeLayout(false);
 		}
+		private System.Windows.Forms.Button button6;
 		private System.Windows.Forms.Button button5;
 		private System.Windows.Forms.PictureBox pictureBox1;
 		private System.Windows.Forms.Button button4;
