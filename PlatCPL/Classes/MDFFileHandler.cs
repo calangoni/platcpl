@@ -69,7 +69,9 @@ namespace PlatCPL.Classes
 				if(file.Position==file.Length)
 				{
 					file.Close();
-					return true;
+					HDBLOCK headerBlock = (HDBLOCK)links[1].block;
+					bool res = headerBlock.resolveLinks(links);
+					return res;
 				}
 			}
 			file.Close();
@@ -91,6 +93,12 @@ namespace PlatCPL.Classes
 			links.Add(new Link(currentAddress, headerBlock));
 			currentAddress += headerBlock.blockSize;
 			
+			TXBLOCK textBlock = new MDFFileHandler.TXBLOCK();
+			textBlock.fillData(currentAddress, "-");
+			links.Add(new Link(currentAddress, textBlock));
+			currentAddress += textBlock.blockSize;
+			headerBlock.linkTXBLOCK = textBlock.address;
+			
 			DGBLOCK dataGBlock = new MDFFileHandler.DGBLOCK();
 			dataGBlock.fillData(currentAddress, 1);
 			links.Add(new Link(currentAddress, dataGBlock));
@@ -102,25 +110,57 @@ namespace PlatCPL.Classes
 			links.Add(new Link(currentAddress, chanGBlock));
 			currentAddress += chanGBlock.blockSize;
 			dataGBlock.linkCGBLOCK = chanGBlock.address;
-			
-			double sampleRate = (time[time.Count-1]-time[0])/time.Count;
+
+			//time channel
 			CNBLOCK channBlock = new MDFFileHandler.CNBLOCK();
-			channBlock.fillData(currentAddress, 1, "time", 8, 2, sampleRate);
+			double sampleRate = (time[time.Count-1]-time[0])/time.Count;
+			channBlock.fillData(currentAddress, 1, "time", 0, 8*8, 3, sampleRate);
 			links.Add(new Link(currentAddress, channBlock));
 			currentAddress += channBlock.blockSize;
 			chanGBlock.linkCNBLOCK = channBlock.address;
 			CNBLOCK lastChannBlock = channBlock;
+
+			CCBLOCK convBlock = new MDFFileHandler.CCBLOCK();
+			convBlock.fillData(currentAddress, 1, time[0], time[time.Count-1], "s", 65535, 0, new byte[0]);
+			links.Add(new Link(currentAddress, convBlock));
+			currentAddress += convBlock.blockSize;
+			channBlock.linkCCBLOCK = convBlock.address;
+			
+			//test second time channel (as data)
+			/*channBlock = new MDFFileHandler.CNBLOCK();
+			channBlock.fillData(currentAddress, 0, "time2", 8*8, 2, sampleRate);
+			links.Add(new Link(currentAddress, channBlock));
+			currentAddress += channBlock.blockSize;
+			lastChannBlock.linkCNBLOCK = channBlock.address;
+			lastChannBlock = channBlock;
+
+			convBlock = new MDFFileHandler.CCBLOCK();
+			convBlock.fillData(currentAddress, 1, time[0], time[time.Count-1], "s", 65535, 0, new byte[0]);
+			links.Add(new Link(currentAddress, convBlock));
+			currentAddress += convBlock.blockSize;
+			channBlock.linkCCBLOCK = convBlock.address;*/
+			
 			string signalName;
+			ushort firstBit = 8*8;
 			for(int i=0; i<workedDataList.Count; i++)
 			{
 				channBlock = new MDFFileHandler.CNBLOCK();
 				signalName = workedDataList[i].LabelName;
 				if(signalName.Length>32) signalName = signalName.Substring(signalName.Length-32);
-				channBlock.fillData(currentAddress, 0, signalName, 8, 2, sampleRate);
+				channBlock.fillData(currentAddress, 0, signalName, firstBit, 8*8, 3, sampleRate);
+				firstBit += 8*8;
 				links.Add(new Link(currentAddress, channBlock));
 				currentAddress += channBlock.blockSize;
 				lastChannBlock.linkCNBLOCK = channBlock.address;
 				lastChannBlock = channBlock;
+				
+				convBlock = new MDFFileHandler.CCBLOCK();
+				//convBlock.fillData(currentAddress, 1, workedDataList[i].minVal, workedDataList[i].maxVal, "U"+i, 0, 0, new byte[]{22,86,231,158,175,3,210,60,  22,86,231,158,175,3,210,60});//0,0,0,0,0,0,240,63});
+				//convBlock.fillData(currentAddress, 1, workedDataList[i].minVal, workedDataList[i].maxVal, "U"+i, 65535, 0, new byte[]{});
+				convBlock.fillData(currentAddress, 0, 0, 0, "U"+i, 0, 2, new byte[]{0,0,0,0,0,0,0,128,   0,0,0,0,0,0,240,63});
+				links.Add(new Link(currentAddress, convBlock));
+				currentAddress += convBlock.blockSize;
+				channBlock.linkCCBLOCK = convBlock.address;
 			}
 			
 			DATABLOCK dataBlock = new MDFFileHandler.DATABLOCK(dataGBlock);
@@ -169,10 +209,9 @@ namespace PlatCPL.Classes
 				}
 				catch(Exception)
 				{
-					
+					fileOutput.Close();
 				}
 			}
-			fileOutput.Close();
 			return false;
 		}
 		
@@ -291,8 +330,8 @@ namespace PlatCPL.Classes
 				floatType  = 0;                                // 0 = IEEE 754
 				versionN   = 300;                              // version number
 				reserved1  = 0;                                // value not defined, picking 0
-				reserved2  = "xx";                             // 2 char, value not defined
-				reserved3  = "[xx.10.xx][xx.20.xx][xx.30.xx]"; // 30 char, value not defined
+				reserved2  = "\0\0";                             // 2 char, value not defined
+				reserved3  = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; // 30 char, value not defined
 
 				return true;
 				//return unParseData();
@@ -335,6 +374,10 @@ namespace PlatCPL.Classes
 			public string project      = "[xx.10.xx][xx.20.xx][xx.30.xx]12"; // 32 char
 			public string measureId    = "[xx.10.xx][xx.20.xx][xx.30.xx]12"; // 32 char
 
+			public DGBLOCK DGblock = null;
+			public TXBLOCK TXblock = null;
+			public PRBLOCK PRblock = null;
+			
 			public override bool parseData(System.Collections.Generic.List<Link> links)
 			{
 				if( data.Length != this.blockSize )return false;
@@ -417,6 +460,17 @@ namespace PlatCPL.Classes
 				{
 					return false;
 				}
+			}
+			public bool resolveLinks(System.Collections.Generic.List<Link> links)
+			{
+				foreach(Link link in links)
+				{
+					if(link.address==linkDGBLOCK && link.blockType=="DG") DGblock = (DGBLOCK)link.block;
+					if(link.address==linkTXBLOCK && link.blockType=="TX") TXblock = (TXBLOCK)link.block;
+					if(link.address==linkPRBLOCK && link.blockType=="PR") PRblock = (PRBLOCK)link.block;
+				}
+				if(DGblock==null)return false;
+				return DGblock.resolveLinks(links);
 			}
 		}
 		public class TXBLOCK : BLOCK
@@ -542,6 +596,7 @@ namespace PlatCPL.Classes
 			public UInt32 reserved2 = 0;
 			
 			public CGBLOCK CGblock = null;
+			public DATABLOCK DATAblock = null;
 
 			public override bool parseData(System.Collections.Generic.List<Link> links)
 			{
@@ -580,15 +635,17 @@ namespace PlatCPL.Classes
 			{
 				foreach(Link link in links)
 				{
-					if(link.address==linkCGBLOCK && link.blockType=="CG")
-					{
-						CGblock = (CGBLOCK)link.block;
-						break;
-					}
+					if(link.address==linkCGBLOCK && link.blockType=="CG") CGblock = (CGBLOCK)link.block;
+					if(link.address==linkDataRecords && link.blockType=="DATA") DATAblock = (DATABLOCK)link.block;
 				}
 				if(CGblock==null)return false;
 				return true;
 				//return CGblock.resolveLinks(links);
+			}
+			public bool resolveLinks(System.Collections.Generic.List<Link> links)
+			{
+				if(resolveCGLink(links))return CGblock.resolveLinks(links);
+				else return false;
 			}
 			public bool fillData(Int32 currentAddress, UInt16 numberOfChannelGroups)
 			{
@@ -676,7 +733,7 @@ namespace PlatCPL.Classes
 					return false;
 				}
 			}
-			public bool resolveLinks(System.Collections.Generic.List<Link> links, int remainingCNs)
+			public bool resolveLinks(System.Collections.Generic.List<Link> links)
 			{
 				foreach(Link link in links)
 				{
@@ -687,7 +744,7 @@ namespace PlatCPL.Classes
 					}
 				}
 				if(CNblock==null)return false;
-				return CNblock.resolveLinks(links, remainingCNs-1);
+				return CNblock.resolveLinks(links, numChannels-1);
 			}
 			public bool fillData(Int32 currentAddress, UInt16 nrecordId, UInt16 nnumChannels, UInt16 nrecordSize, UInt32 nnumRecords)
 			{
@@ -743,7 +800,7 @@ namespace PlatCPL.Classes
 			public UInt16 channelType = 0; // 0=data, 1=time
 			public string signalName = "[xx.10.xx][xx.20.xx][xx.30.xx]12"; // 32 char
 			public string signalDescription = ""; // 128 char
-			public UInt16 numFirstBits = 0;
+			public UInt16 numFirstBit = 0;
 			public UInt16 numBits = 0;
 			public UInt16 dataType = 2; // 2,3 = IEEE 754 floating-point format
 			public UInt16 boolKnownImp = 0; // Value range – known implementation value
@@ -755,6 +812,7 @@ namespace PlatCPL.Classes
 			public UInt16 byteOffset = 0; // default value: 0
 
 			public CNBLOCK CNblock = null;
+			public CCBLOCK CCblock = null;
 
 			public override bool parseData(System.Collections.Generic.List<Link> links)
 			{
@@ -772,7 +830,7 @@ namespace PlatCPL.Classes
 					channelType = BitConverter.ToUInt16(data, 24);
 					signalName = new string(System.Text.Encoding.ASCII.GetChars(data, 26, 32));
 					signalDescription = new string(System.Text.Encoding.ASCII.GetChars(data, 58, 128));
-					numFirstBits = BitConverter.ToUInt16(data, 186);
+					numFirstBit = BitConverter.ToUInt16(data, 186);
 					numBits = BitConverter.ToUInt16(data, 188);
 					dataType = BitConverter.ToUInt16(data, 190);
 					boolKnownImp = BitConverter.ToUInt16(data, 192);
@@ -808,16 +866,13 @@ namespace PlatCPL.Classes
 				}
 				foreach(Link link in links)
 				{
-					if(link.address==linkCNBLOCK && link.blockType=="CN")
-					{
-						CNblock = (CNBLOCK)link.block;
-						break;
-					}
+					if(link.address==linkCNBLOCK && link.blockType=="CN") CNblock = (CNBLOCK)link.block;
+					if(link.address==linkCCBLOCK && link.blockType=="CC") CCblock = (CCBLOCK)link.block;
 				}
 				if(CNblock==null)return false;
 				return CNblock.resolveLinks(links, remainingCNs-1);
 			}
-			public bool fillData(Int32 currentAddress, UInt16 nchannelType, string nsignalName, UInt16 nnumBits, UInt16 ndataType, double nsampleRate)
+			public bool fillData(Int32 currentAddress, UInt16 nchannelType, string nsignalName, UInt16 nnumFirstBit, UInt16 nnumBits, UInt16 ndataType, double nsampleRate)
 			{
 				address = currentAddress; // address of this block
 				blockId = "CN";
@@ -831,7 +886,7 @@ namespace PlatCPL.Classes
 				channelType = nchannelType; // 0=data, 1=time
 				signalName = nsignalName; // 32 char
 				signalDescription = ""; // 128 char
-				numFirstBits = 0;
+				numFirstBit = nnumFirstBit;
 				numBits = nnumBits;
 				dataType = ndataType; // 2,3 = IEEE 754 floating-point format
 				boolKnownImp = 0; // Value range – known implementation value
@@ -865,7 +920,7 @@ namespace PlatCPL.Classes
 					for(int i=(26+signalName.Length); i<(26+32); i++)data[i]=0;
 					System.Text.Encoding.ASCII.GetBytes(signalDescription).CopyTo(data, 58);
 					for(int i=(58+signalDescription.Length); i<(58+128); i++)data[i]=0;
-					BitConverter.GetBytes(numFirstBits).CopyTo(data, 186);
+					BitConverter.GetBytes(numFirstBit).CopyTo(data, 186);
 					BitConverter.GetBytes(numBits).CopyTo(data, 188);
 					BitConverter.GetBytes(dataType).CopyTo(data, 190);
 					BitConverter.GetBytes(boolKnownImp).CopyTo(data, 192);
@@ -910,7 +965,7 @@ namespace PlatCPL.Classes
 					convFormType = BitConverter.ToUInt16(data, 42);
 					numPar = BitConverter.ToUInt16(data, 44);
 					parameters = new byte[data.Length-46];
-					for(int i=0; i<parameters.Length; i++) parameters[i] = data[i+46];
+					for(int i=0; i<parameters.Length; i++) parameters[i] = data[46+i];
 
 					if(this.blockId != "CC") return false;
 
@@ -921,15 +976,15 @@ namespace PlatCPL.Classes
 					return false;
 				}
 			}
-			public bool fillData(Int32 currentAddress, string nphysUnit, UInt16 nconvFormType, UInt16 nnumPar, byte[] nparameters)
+			public bool fillData(Int32 currentAddress, UInt16 nboolKnownPhy, double nminPhyVal, double nmaxPhyVal, string nphysUnit, UInt16 nconvFormType, UInt16 nnumPar, byte[] nparameters)
 			{
 				address = currentAddress; // address of this block
 				blockId = "CC";
-				blockSize = (ushort)(46 + parameters.Length);
+				blockSize = (ushort)(46 + nparameters.Length);
 				
-				boolKnownPhy = 0; // Value range – known physical value
-				minPhyVal = 0; // Value range – minimum physical value
-				maxPhyVal = 0; // Value range – maximum physical value
+				boolKnownPhy = nboolKnownPhy; // Value range – known physical value
+				minPhyVal = nminPhyVal; // Value range – minimum physical value
+				maxPhyVal = nmaxPhyVal; // Value range – maximum physical value
 				physUnit = nphysUnit; // 20 char
 				convFormType = nconvFormType; // Conversion formula identifier
 				numPar = nnumPar; // number of parameters
@@ -1028,6 +1083,12 @@ namespace PlatCPL.Classes
 				
 				if(currentPosition != dataBlockSize)return false;
 				else return true;
+			}
+			public double getDoubleValue(int dataRecordNumber, int channelNumber)
+			{
+				int position = DGblock.CGblock.recordSize*dataRecordNumber + 8*channelNumber;
+				if(position<data.Length-8) return BitConverter.ToDouble(data, position);
+				return 0;
 			}
 		}
 		

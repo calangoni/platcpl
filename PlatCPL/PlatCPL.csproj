@@ -13,7 +13,7 @@
     <NoStdLib>False</NoStdLib>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <BaseIntermediateOutputPath>Properties\obj\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>_Properties_\obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -23,7 +23,7 @@
     <FileAlignment>4096</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <OutputPath>Properties\bin\Debug\</OutputPath>
+    <OutputPath>_Properties_\bin\Debug\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>Full</DebugType>
     <Optimize>False</Optimize>
@@ -31,7 +31,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <OutputPath>Properties\bin\Release\</OutputPath>
+    <OutputPath>_Properties_\bin\Release\</OutputPath>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>None</DebugType>
     <Optimize>True</Optimize>
@@ -69,21 +69,21 @@
     <Compile Include="Interfaces\PhoneBook.Designer.cs">
       <DependentUpon>PhoneBook.cs</DependentUpon>
     </Compile>
-    <Compile Include="PlatCPL\Constants.cs" />
-    <Compile Include="PlatCPL\I_PlatCPLv4.cs" />
-    <Compile Include="PlatCPL\I_PlatCPLv4.Designer.cs">
+    <Compile Include="PlatCore\Constants.cs" />
+    <Compile Include="PlatCore\I_PlatCPLv4.cs" />
+    <Compile Include="PlatCore\I_PlatCPLv4.Designer.cs">
       <DependentUpon>I_PlatCPLv4.cs</DependentUpon>
     </Compile>
-    <Compile Include="PlatCPL\PcAppHandler.cs" />
-    <Compile Include="PlatCPL\PlatCPLv4Core.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PlatCore\PcAppHandler.cs" />
+    <Compile Include="PlatCore\PlatCPLv4Core.cs" />
+    <Compile Include="_Properties_\AssemblyInfo.cs" />
     <Compile Include="Classes\PhoneContacts.cs" />
     <Compile Include="Classes\PlatCPL_Data.cs" />
-    <Compile Include="Properties\MainForm.cs" />
-    <Compile Include="Properties\MainForm.Designer.cs">
+    <Compile Include="_Properties_\MainForm.cs" />
+    <Compile Include="_Properties_\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Program.cs" />
+    <Compile Include="_Properties_\Program.cs" />
     <Compile Include="ThirdParty\HardwareHelperLib.cs" />
     <Compile Include="ThirdParty\matlab\common\ByteBuffer.cs" />
     <Compile Include="ThirdParty\matlab\common\MatDataTypes.cs" />
@@ -114,20 +114,17 @@
     <Compile Include="ThirdParty\matlab\types\MLUInt64.cs" />
     <Compile Include="ThirdParty\matlab\types\MLUint8.cs" />
     <Compile Include="ThirdParty\ThirdParty.cs" />
-    <None Include="Documents\MDFspecificationv03.pdf" />
+    <None Include="_Documents_\MDFspecificationv03.pdf" />
     <None Include="ThirdParty\zlib.net.dll" />
-    <EmbeddedResource Include="Interfaces\MatlabFilesAnalyzer.resx">
-      <DependentUpon>MatlabFilesAnalyzer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PlatCPL\I_PlatCPLv4.resx">
+    <EmbeddedResource Include="PlatCore\I_PlatCPLv4.resx">
       <DependentUpon>I_PlatCPLv4.Designer.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes" />
     <Folder Include="Interfaces" />
-    <Folder Include="Documents" />
-    <Folder Include="PlatCPL" />
+    <Folder Include="_Documents_" />
+    <Folder Include="PlatCore" />
     <Folder Include="ThirdParty" />
     <Folder Include="ThirdParty\matlab" />
     <Folder Include="ThirdParty\matlab\common" />
