@@ -299,12 +299,39 @@ namespace PlatCPL.Interfaces
 		
 		void B_Test(object sender, EventArgs e) // test
 		{
+			/*byte[] bytes;
+			bytes = new byte[]{ 0,0,0,0,0,0,0,128 }; // 0
+			comm.msgDebug(" ["+BitConverter.ToDouble(bytes,0).ToString() +"]");
+			bytes = new byte[]{ 123,20,174,71,225,122,132,63 }; // 0.01
+			comm.msgDebug(" ["+BitConverter.ToDouble(bytes,0).ToString() +"]");
+			bytes = new byte[]{ 0,0,0,0,0,0,240,63 }; // 1
+			comm.msgDebug(" ["+BitConverter.ToDouble(bytes,0).ToString() +"]");
+			bytes = new byte[]{ 22,86,231,158,175,3,210,60 }; // 0.000000000000001
+			comm.msgDebug(" ["+BitConverter.ToDouble(bytes,0).ToString() +"]");
+			double val = 0.000000000000001;
+			byte[] testDouble = BitConverter.GetBytes(val);
+			comm.msgDebug("["+testDouble[0]+"]["+testDouble[1]+"]["+testDouble[2]+"]["+testDouble[3]+"]["+testDouble[4]+"]["+testDouble[5]+"]["+testDouble[6]+"]["+testDouble[7]+"]");
+			val = 1;
+			testDouble = BitConverter.GetBytes(val);
+			comm.msgDebug("["+testDouble[0]+"]["+testDouble[1]+"]["+testDouble[2]+"]["+testDouble[3]+"]["+testDouble[4]+"]["+testDouble[5]+"]["+testDouble[6]+"]["+testDouble[7]+"]");*/
+			
 			MDFFileHandler manager = new MDFFileHandler();
 			string fileName = comm.selectFileNN("*.dat|*.dat","Select file");
 			bool result = false;
 			if(fileName.Length>0)
 			{
 				result = manager.readMdfFile(fileName);
+				string line;
+				for(int i=0; i<30; i++)
+				{
+					MDFFileHandler.HDBLOCK headerBlock = (MDFFileHandler.HDBLOCK)manager.links[1].block;
+					line = " (";
+					line += headerBlock.DGblock.DATAblock.getDoubleValue(100*(i+1), 0).ToString();
+					line += ") - (";
+					line += headerBlock.DGblock.DATAblock.getDoubleValue(100*(i+1), 1).ToString();
+					line += ")";
+					comm.msgDebug(line);
+				}
 			}
 		}
 	}

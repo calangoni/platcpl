@@ -16,14 +16,19 @@ namespace PlatCPL.Classes
 	/// </summary>
 	public class WorkedData
 	{
+		public double minVal;
+		public double maxVal;
 		List<double> data;
 		List<double> time;
 		string labelName;
+
 		public WorkedData( List<double> time , string labelName)
 		{
 			this.data = new List<double>();
 			this.time = time;
 			this.labelName = labelName;
+			this.minVal = 0;
+			this.maxVal = 0;
 		}
 		
 		public bool CreateData( VariableInfo vi  )
@@ -38,9 +43,18 @@ namespace PlatCPL.Classes
 			}
 			else
 			{
+				double val;
 				for ( int i = 0 ; i < this.time.Count ; i++ )
 				{
-					this.data.Add( vi.GetInterpVal( this.time[ i ] ) );
+					val = vi.GetInterpVal( this.time[ i ] );
+					this.data.Add( val );
+					if(i==0)
+					{
+						this.minVal = val;
+						this.maxVal = val;
+					}
+					if(val<this.minVal)this.minVal = val;
+					if(val>this.maxVal)this.maxVal = val;
 				}
 				return true;
 			}
